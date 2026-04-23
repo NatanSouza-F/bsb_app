@@ -1,11 +1,11 @@
 """
-BSB Contabilidade — Plataforma de Cadastro Inteligente v3.0
-Visual: Premium Dark — referência XP Investimentos
+BSB Contabilidade — Plataforma de Cadastro Inteligente v4.0
 """
 
 import streamlit as st
 import requests
 import re
+import io
 from datetime import datetime, date
 from typing import Dict, Optional
 
@@ -20,23 +20,23 @@ st.set_page_config(
 )
 
 # =============================================================================
-# CSS PREMIUM v3.0 — TIPOGRAFIA REFINADA + CARDS DE SERVIÇOS + CÂMERA
+# CSS v4.0 — WORDMARK PULSE-STYLE + UNIFORMIDADE + REFINAMENTO GERAL
 # =============================================================================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-/* ─── RESET ─────────────────────────────────────────────────────────── */
+/* ─── BASE ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 * {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── APP BACKGROUND ────────────────────────────────────────────────── */
+/* ─── BACKGROUND ────────────────────────────────────────────────────── */
 .stApp {
-    background: #06101c;
+    background: #070e1a;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
@@ -44,307 +44,261 @@ st.markdown("""
 .stApp::before {
     content: '';
     position: fixed;
-    top: -30%;
-    left: -15%;
-    width: 70%;
-    height: 70%;
-    background: radial-gradient(ellipse, rgba(30,86,220,0.10) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
+    top: -25%; left: -10%;
+    width: 65%; height: 65%;
+    background: radial-gradient(ellipse, rgba(26,75,216,0.11) 0%, transparent 68%);
+    pointer-events: none; z-index: 0;
     animation: breathe 9s ease-in-out infinite;
 }
 .stApp::after {
     content: '';
     position: fixed;
-    bottom: -20%;
-    right: -5%;
-    width: 50%;
-    height: 50%;
-    background: radial-gradient(ellipse, rgba(5,160,200,0.06) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
-    animation: breathe 12s ease-in-out infinite reverse;
+    bottom: -15%; right: -5%;
+    width: 45%; height: 45%;
+    background: radial-gradient(ellipse, rgba(5,155,195,0.06) 0%, transparent 68%);
+    pointer-events: none; z-index: 0;
+    animation: breathe 13s ease-in-out infinite reverse;
 }
 @keyframes breathe {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.12); opacity: 1; }
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    50%       { transform: scale(1.1); opacity: 1; }
 }
 
-/* ─── BLOCK CONTAINER ───────────────────────────────────────────────── */
+/* ─── CONTAINER ─────────────────────────────────────────────────────── */
 .block-container {
-    max-width: 580px !important;
-    padding: 1.4rem 1.2rem 3rem 1.2rem !important;
-    position: relative;
-    z-index: 1;
+    max-width: 572px !important;
+    padding: 1.2rem 1.1rem 3rem !important;
+    position: relative; z-index: 1;
 }
 
 /* ─── HERO ──────────────────────────────────────────────────────────── */
 .hero-wrapper {
     text-align: center;
-    padding: 2.2rem 0 0.6rem 0;
-    animation: fadeSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    padding: 2rem 0 0.4rem;
+    animation: fadeDown 0.75s cubic-bezier(0.16,1,0.3,1) both;
 }
-@keyframes fadeSlideDown {
-    from { opacity: 0; transform: translateY(-24px); }
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Wordmark — serifado elegante para "BSB" + sans para "Contabilidade" */
-.bsb-wordmark-line1 {
-    font-family: 'Instrument Serif', Georgia, serif !important;
-    font-size: clamp(2.6rem, 8vw, 3.6rem);
-    font-weight: 400;
-    font-style: italic;
-    letter-spacing: -0.01em;
-    background: linear-gradient(135deg, #4f8ef7 0%, #6cb4fc 50%, #34c3e8 100%);
+/*
+  WORDMARK — estilo Pulse:
+  • Plus Jakarta Sans Bold
+  • Gradiente azul horizontal com leve drop-shadow luminoso
+  • Sem serifa, sem itálico — limpo e forte
+*/
+.bsb-wordmark {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: clamp(2.1rem, 7.5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    background: linear-gradient(90deg, #3a7bd5 0%, #5ba3f5 40%, #40c8e0 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    line-height: 1.0;
-    filter: drop-shadow(0 0 22px rgba(79,142,247,0.30));
+    filter: drop-shadow(0 0 18px rgba(58,123,213,0.38));
     display: block;
+    line-height: 1.05;
 }
-.bsb-wordmark-line2 {
-    font-family: 'Plus Jakarta Sans', sans-serif !important;
-    font-size: clamp(0.9rem, 3vw, 1.05rem);
-    font-weight: 600;
-    letter-spacing: 0.22em;
+.bsb-sub {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: #475569;
+    color: #2d3f58;
     display: block;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 .bsb-slogan {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: 400;
-    color: #334155;
-    margin-top: 0.5rem;
-    letter-spacing: 0.015em;
+    color: #2d3f58;
+    margin-top: 0.45rem;
+    letter-spacing: 0.01em;
 }
 
-/* ─── SERVIÇOS CARDS (hero) ─────────────────────────────────────────── */
-.servicos-strip {
+/* ─── SERVICE CARDS STRIP ───────────────────────────────────────────── */
+.srv-strip {
     display: flex;
-    gap: 10px;
-    margin: 1.6rem 0 0.2rem 0;
+    gap: 9px;
+    margin: 1.5rem 0 0.1rem;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding-bottom: 3px;
     scrollbar-width: none;
 }
-.servicos-strip::-webkit-scrollbar { display: none; }
+.srv-strip::-webkit-scrollbar { display: none; }
 .srv-card {
-    flex: 1;
-    min-width: 110px;
-    background: rgba(255,255,255,0.025);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-    padding: 14px 10px 12px 10px;
+    flex: 1; min-width: 106px;
+    background: rgba(255,255,255,0.022);
+    border: 1px solid rgba(255,255,255,0.055);
+    border-radius: 13px;
+    padding: 13px 8px 11px;
     text-align: center;
     position: relative;
     overflow: hidden;
-    animation: cardEnter 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    animation: cardIn 0.55s cubic-bezier(0.16,1,0.3,1) both;
 }
-.srv-card:nth-child(1) { animation-delay: 0.08s; }
-.srv-card:nth-child(2) { animation-delay: 0.16s; }
-.srv-card:nth-child(3) { animation-delay: 0.24s; }
-.srv-card:nth-child(4) { animation-delay: 0.32s; }
-.srv-card::before {
+.srv-card:nth-child(1) { animation-delay: 0.07s; }
+.srv-card:nth-child(2) { animation-delay: 0.14s; }
+.srv-card:nth-child(3) { animation-delay: 0.21s; }
+.srv-card:nth-child(4) { animation-delay: 0.28s; }
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.srv-card::after {
     content: '';
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(79,142,247,0.5), transparent);
-    animation: shimmer-line 3s ease-in-out infinite;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent 0%, rgba(58,123,213,0.55) 50%, transparent 100%);
+    animation: shimLine 3.5s ease-in-out infinite;
 }
-@keyframes shimmer-line {
-    0%, 100% { opacity: 0; transform: scaleX(0.4); }
-    50% { opacity: 1; transform: scaleX(1); }
+@keyframes shimLine {
+    0%,100% { opacity: 0; transform: scaleX(0.35); }
+    50%      { opacity: 1; transform: scaleX(1); }
 }
-.srv-card .srv-icon {
-    font-size: 1.4rem;
-    display: block;
-    margin-bottom: 6px;
-    animation: floatIcon 4s ease-in-out infinite;
+.srv-icon {
+    font-size: 1.35rem;
+    display: block; margin-bottom: 5px;
+    animation: floatY 4s ease-in-out infinite;
 }
 .srv-card:nth-child(2) .srv-icon { animation-delay: 0.5s; }
-.srv-card:nth-child(3) .srv-icon { animation-delay: 1s; }
+.srv-card:nth-child(3) .srv-icon { animation-delay: 1.0s; }
 .srv-card:nth-child(4) .srv-icon { animation-delay: 1.5s; }
-@keyframes floatIcon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
+@keyframes floatY {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-2.5px); }
 }
-.srv-card .srv-title {
-    font-size: 0.68rem;
+.srv-title {
+    font-size: 0.65rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: #8faac8;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     line-height: 1.3;
 }
-.srv-card .srv-desc {
-    font-size: 0.62rem;
-    color: #475569;
-    margin-top: 3px;
-    line-height: 1.35;
-    font-weight: 400;
-}
-
-/* ─── STEP INDICATOR ────────────────────────────────────────────────── */
-.step-track {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    margin: 1.8rem auto 1.6rem auto;
-    width: 100%;
-    max-width: 340px;
-    animation: fadeIn 0.6s ease both;
-    animation-delay: 0.4s;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.step-node {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    flex: 1;
-    position: relative;
-    z-index: 2;
-}
-.step-circle {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.75rem;
-    transition: all 0.3s ease;
-}
-.step-circle.done {
-    background: #1e4bd8;
-    color: white;
-    box-shadow: 0 0 12px rgba(79,142,247,0.4);
-}
-.step-circle.active {
-    background: #1e4bd8;
-    color: white;
-    box-shadow: 0 0 0 3px rgba(79,142,247,0.18), 0 0 16px rgba(79,142,247,0.45);
-    animation: ring-pulse 2.2s ease-in-out infinite;
-}
-@keyframes ring-pulse {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(79,142,247,0.18), 0 0 16px rgba(79,142,247,0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(79,142,247,0.08), 0 0 22px rgba(79,142,247,0.55); }
-}
-.step-circle.pending {
-    background: rgba(20,30,48,0.9);
-    color: #334155;
-    border: 1px solid rgba(51,65,85,0.4);
-}
-.step-label {
-    font-size: 0.58rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #334155;
-    text-align: center;
-    white-space: nowrap;
-}
-.step-label.active { color: #4f8ef7; }
-.step-connector {
-    flex: 1;
-    height: 1px;
-    background: rgba(51,65,85,0.5);
-    margin-top: 15px;
-    position: relative;
-    z-index: 1;
-    max-width: 36px;
-}
-.step-connector.done { background: #1e4bd8; }
-
-/* ─── SECTION CARD ──────────────────────────────────────────────────── */
-.section-card {
-    background: rgba(10,18,32,0.92);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 1.5rem 1.4rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
-    animation: cardEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-@keyframes cardEnter {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.card-title {
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #475569;
-    margin-bottom: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.card-title-icon {
-    width: 26px; height: 26px;
-    border-radius: 7px;
-    background: rgba(79,142,247,0.12);
-    border: 1px solid rgba(79,142,247,0.18);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.78rem;
+.srv-desc {
+    font-size: 0.6rem;
+    color: #3d5069;
+    margin-top: 2px;
+    line-height: 1.3;
 }
 
 /* ─── LGPD BOX ──────────────────────────────────────────────────────── */
 .lgpd-box {
-    display: flex;
-    gap: 10px;
-    background: rgba(79,142,247,0.04);
-    border: 1px solid rgba(79,142,247,0.12);
-    border-radius: 10px;
-    padding: 11px 14px;
-    margin-bottom: 1.2rem;
-    animation: fadeIn 0.9s ease both;
-    animation-delay: 0.6s;
+    display: flex; gap: 10px;
+    background: rgba(58,123,213,0.045);
+    border: 1px solid rgba(58,123,213,0.11);
+    border-radius: 9px;
+    padding: 10px 13px;
+    margin-bottom: 1.1rem;
+    animation: fadeIn 1s ease both;
+    animation-delay: 0.55s;
 }
-.lgpd-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
-.lgpd-text { font-size: 0.74rem; color: #334155; line-height: 1.5; }
-.lgpd-text strong { color: #64748b; font-weight: 600; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.lgpd-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+.lgpd-text { font-size: 0.72rem; color: #2d3f58; line-height: 1.5; }
+.lgpd-text strong { color: #536882; font-weight: 600; }
 
-/* ─── AUTO-FILL BADGE ───────────────────────────────────────────────── */
+/* ─── STEP TRACK ────────────────────────────────────────────────────── */
+.step-track {
+    display: flex; align-items: flex-start; justify-content: center;
+    margin: 1.6rem auto 1.4rem;
+    max-width: 330px; width: 100%;
+    animation: fadeIn 0.6s ease both; animation-delay: 0.35s;
+}
+.step-node {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; flex: 1; position: relative; z-index: 2;
+}
+.step-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.72rem;
+    transition: all 0.28s ease;
+}
+.step-circle.done   { background: #1a43cc; color: #fff; box-shadow: 0 0 10px rgba(58,123,213,0.38); }
+.step-circle.active {
+    background: #1a43cc; color: #fff;
+    box-shadow: 0 0 0 3px rgba(58,123,213,0.16), 0 0 14px rgba(58,123,213,0.42);
+    animation: ringPulse 2.3s ease-in-out infinite;
+}
+@keyframes ringPulse {
+    0%,100% { box-shadow: 0 0 0 3px rgba(58,123,213,0.16), 0 0 14px rgba(58,123,213,0.38); }
+    50%     { box-shadow: 0 0 0 6px rgba(58,123,213,0.07), 0 0 20px rgba(58,123,213,0.52); }
+}
+.step-circle.pending {
+    background: rgba(18,28,44,0.9); color: #2d3f58;
+    border: 1px solid rgba(45,63,88,0.5);
+}
+.step-label {
+    font-size: 0.56rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: #2d3f58; text-align: center; white-space: nowrap;
+}
+.step-label.active { color: #5ba3f5; }
+.step-connector {
+    flex: 1; height: 1px; background: rgba(45,63,88,0.5);
+    margin-top: 14px; position: relative; z-index: 1; max-width: 34px;
+}
+.step-connector.done { background: #1a43cc; }
+
+/* ─── SECTION CARD ──────────────────────────────────────────────────── */
+.section-card {
+    background: rgba(9,16,30,0.93);
+    border: 1px solid rgba(255,255,255,0.055);
+    border-radius: 14px;
+    padding: 1.35rem 1.3rem;
+    margin-bottom: 0.9rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5), 0 6px 20px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.025);
+    animation: cardIn 0.42s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+/* ─── CARD TITLE ────────────────────────────────────────────────────── */
+.card-title {
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: #3d5069; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 7px;
+}
+.ct-icon {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: rgba(58,123,213,0.1);
+    border: 1px solid rgba(58,123,213,0.15);
+    display: inline-flex; align-items: center;
+    justify-content: center; font-size: 0.73rem;
+}
+
+/* ─── AUTO BADGE ────────────────────────────────────────────────────── */
 .auto-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(16,185,129,0.08);
-    border: 1px solid rgba(16,185,129,0.2);
-    border-radius: 6px;
-    padding: 3px 9px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: #34d399;
-    margin-bottom: 8px;
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(16,185,129,0.07);
+    border: 1px solid rgba(16,185,129,0.18);
+    border-radius: 5px; padding: 2px 8px;
+    font-size: 0.65rem; font-weight: 600;
+    color: #2dd4a0; margin-bottom: 7px;
     letter-spacing: 0.03em;
 }
 
 /* ─── DIVIDER ───────────────────────────────────────────────────────── */
 .divider {
     border: none;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    margin: 1.1rem 0;
+    border-top: 1px solid rgba(255,255,255,0.042);
+    margin: 1rem 0;
 }
 
-/* ─── STREAMLIT LABEL OVERRIDES ─────────────────────────────────────── */
+/* ─── LABELS ────────────────────────────────────────────────────────── */
 label,
 .stTextInput label, .stNumberInput label,
-.stSelectbox label, .stRadio label, .stCheckbox label,
-.stDateInput label, .stTextArea label {
-    color: #64748b !important;
-    font-size: 0.76rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.035em !important;
+.stSelectbox label, .stRadio label,
+.stCheckbox label, .stDateInput label,
+.stTextArea label {
+    color: #536882 !important;
+    font-size: 0.73rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
     text-transform: uppercase !important;
 }
 
@@ -353,212 +307,190 @@ input, textarea,
 .stNumberInput input,
 div[data-baseweb="input"] > div,
 div[data-baseweb="textarea"] > div {
-    background: rgba(6,14,26,0.85) !important;
-    border: 1px solid rgba(255,255,255,0.07) !important;
-    color: #e2e8f0 !important;
-    border-radius: 9px !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-    transition: border-color 0.18s, box-shadow 0.18s !important;
+    background: rgba(5,11,22,0.88) !important;
+    border: 1px solid rgba(255,255,255,0.065) !important;
+    color: #dde6f0 !important;
+    border-radius: 8px !important;
+    font-size: 0.865rem !important;
+    font-weight: 500 !important;
+    transition: border-color 0.16s, box-shadow 0.16s !important;
+    min-height: 40px !important;
 }
 input:focus, textarea:focus {
-    border-color: rgba(79,142,247,0.55) !important;
-    box-shadow: 0 0 0 3px rgba(79,142,247,0.08) !important;
-    outline: none !important;
+    border-color: rgba(58,123,213,0.5) !important;
+    box-shadow: 0 0 0 3px rgba(58,123,213,0.08) !important;
 }
-input::placeholder, textarea::placeholder { color: #1e293b !important; }
+input::placeholder, textarea::placeholder { color: #1c2d42 !important; }
 
 /* Select */
 div[data-baseweb="select"] > div {
-    background: rgba(6,14,26,0.85) !important;
-    border: 1px solid rgba(255,255,255,0.07) !important;
-    border-radius: 9px !important;
-    font-size: 0.875rem !important;
-    color: #e2e8f0 !important;
+    background: rgba(5,11,22,0.88) !important;
+    border: 1px solid rgba(255,255,255,0.065) !important;
+    border-radius: 8px !important;
+    font-size: 0.865rem !important;
+    font-weight: 500 !important;
+    color: #dde6f0 !important;
+    min-height: 40px !important;
 }
 div[data-baseweb="menu"] {
-    background: #0a1220 !important;
+    background: #0a1525 !important;
     border: 1px solid rgba(255,255,255,0.07) !important;
-    border-radius: 10px !important;
+    border-radius: 9px !important;
 }
-div[data-baseweb="option"] { color: #cbd5e1 !important; font-size: 0.85rem !important; }
-div[data-baseweb="option"]:hover { background: rgba(79,142,247,0.12) !important; }
+div[data-baseweb="option"] { color: #b0c4d8 !important; font-size: 0.845rem !important; }
+div[data-baseweb="option"]:hover { background: rgba(58,123,213,0.1) !important; }
 
-/* ─── BUTTONS ───────────────────────────────────────────────────────── */
+/* Date input — forçar fundo escuro */
+div[data-baseweb="datepicker"] input { color: #dde6f0 !important; }
+
+/* ─── BUTTONS — tamanho único, uniforme ─────────────────────────────── */
 .stButton > button {
     background: #1a43cc !important;
-    color: white !important;
+    color: #fff !important;
     border: none !important;
-    border-radius: 10px !important;
-    padding: 0.68rem 1.1rem !important;
+    border-radius: 9px !important;
+    /* padding uniforme para todos os botões */
+    padding: 0 1rem !important;
+    height: 40px !important;
+    min-height: 40px !important;
     font-weight: 700 !important;
-    font-size: 0.78rem !important;
+    font-size: 0.76rem !important;
     letter-spacing: 0.07em !important;
     text-transform: uppercase !important;
     width: 100% !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 14px rgba(26,67,204,0.28) !important;
-    transition: all 0.18s ease !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 3px 12px rgba(26,67,204,0.25) !important;
+    transition: all 0.16s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 .stButton > button:hover {
     background: #1e4bd8 !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4), 0 6px 20px rgba(26,67,204,0.4) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), 0 5px 18px rgba(26,67,204,0.38) !important;
 }
-.stButton > button:active {
-    transform: translateY(0) scale(0.99) !important;
-}
+.stButton > button:active { transform: scale(0.99) !important; }
 .stButton > button[kind="secondary"] {
-    background: rgba(10,18,32,0.9) !important;
-    border: 1px solid rgba(255,255,255,0.09) !important;
-    color: #64748b !important;
+    background: rgba(9,16,30,0.92) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    color: #536882 !important;
     box-shadow: none !important;
 }
 .stButton > button[kind="secondary"]:hover {
-    border-color: rgba(79,142,247,0.3) !important;
-    color: #94a3b8 !important;
-    background: rgba(79,142,247,0.05) !important;
+    border-color: rgba(58,123,213,0.3) !important;
+    color: #8faac8 !important;
+    background: rgba(58,123,213,0.04) !important;
 }
 
 /* ─── RADIO ─────────────────────────────────────────────────────────── */
-.stRadio > div { gap: 6px !important; flex-wrap: wrap !important; }
+.stRadio > div { gap: 5px !important; flex-wrap: wrap !important; }
 .stRadio > div > label {
-    background: rgba(6,14,26,0.8) !important;
-    border: 1px solid rgba(255,255,255,0.07) !important;
-    border-radius: 8px !important;
-    padding: 7px 12px !important;
-    color: #64748b !important;
-    font-size: 0.8rem !important;
-    font-weight: 500 !important;
-    transition: all 0.18s !important;
+    background: rgba(5,11,22,0.82) !important;
+    border: 1px solid rgba(255,255,255,0.065) !important;
+    border-radius: 7px !important;
+    padding: 6px 11px !important;
+    color: #536882 !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    transition: all 0.16s !important;
+    text-transform: none !important;
+    letter-spacing: 0.01em !important;
 }
 .stRadio > div > label:has(input:checked) {
-    border-color: rgba(79,142,247,0.45) !important;
-    background: rgba(26,67,204,0.1) !important;
-    color: #93b4fb !important;
+    border-color: rgba(58,123,213,0.4) !important;
+    background: rgba(26,67,204,0.09) !important;
+    color: #7aaaf5 !important;
 }
 
 /* ─── CHECKBOX ──────────────────────────────────────────────────────── */
 .stCheckbox > label {
-    color: #64748b !important;
+    color: #536882 !important;
     font-size: 0.82rem !important;
     font-weight: 500 !important;
     text-transform: none !important;
     letter-spacing: 0.01em !important;
 }
-input[type="checkbox"] { accent-color: #1e4bd8 !important; }
+input[type="checkbox"] { accent-color: #1a43cc !important; }
 
 /* ─── MULTISELECT ───────────────────────────────────────────────────── */
 span[data-baseweb="tag"] {
-    background: rgba(26,67,204,0.2) !important;
-    border: 1px solid rgba(79,142,247,0.3) !important;
-    border-radius: 6px !important;
-    color: #93b4fb !important;
-    font-size: 0.75rem !important;
+    background: rgba(26,67,204,0.18) !important;
+    border: 1px solid rgba(58,123,213,0.28) !important;
+    border-radius: 5px !important;
+    color: #7aaaf5 !important;
+    font-size: 0.73rem !important;
 }
 
 /* ─── ALERTS ────────────────────────────────────────────────────────── */
-div[data-testid="stAlert"] {
-    border-radius: 9px !important;
-    font-size: 0.82rem !important;
-}
-.stSuccess { background: rgba(16,185,129,0.07) !important; border: 1px solid rgba(16,185,129,0.2) !important; }
-.stError { background: rgba(239,68,68,0.07) !important; border: 1px solid rgba(239,68,68,0.2) !important; }
-.stInfo { background: rgba(79,142,247,0.06) !important; border: 1px solid rgba(79,142,247,0.18) !important; }
-.stWarning { background: rgba(245,158,11,0.07) !important; border: 1px solid rgba(245,158,11,0.2) !important; }
+div[data-testid="stAlert"] { border-radius: 8px !important; font-size: 0.8rem !important; }
+.stSuccess  { background: rgba(16,185,129,0.06) !important; border: 1px solid rgba(16,185,129,0.18) !important; }
+.stError    { background: rgba(239,68,68,0.06) !important;  border: 1px solid rgba(239,68,68,0.18) !important; }
+.stInfo     { background: rgba(58,123,213,0.06) !important; border: 1px solid rgba(58,123,213,0.16) !important; }
+.stWarning  { background: rgba(245,158,11,0.06) !important; border: 1px solid rgba(245,158,11,0.18) !important; }
 
 /* ─── FILE UPLOADER ─────────────────────────────────────────────────── */
 div[data-testid="stFileUploader"] {
-    background: rgba(6,14,26,0.7) !important;
-    border: 1.5px dashed rgba(255,255,255,0.08) !important;
-    border-radius: 12px !important;
-    transition: border-color 0.2s !important;
+    background: rgba(5,11,22,0.65) !important;
+    border: 1.5px dashed rgba(255,255,255,0.07) !important;
+    border-radius: 10px !important;
+    transition: border-color 0.18s !important;
 }
-div[data-testid="stFileUploader"]:hover {
-    border-color: rgba(79,142,247,0.35) !important;
-}
+div[data-testid="stFileUploader"]:hover { border-color: rgba(58,123,213,0.32) !important; }
 div[data-testid="stFileUploader"] label {
     text-transform: none !important;
-    font-size: 0.82rem !important;
+    font-size: 0.8rem !important;
     letter-spacing: 0.01em !important;
-    color: #94a3b8 !important;
+    color: #8faac8 !important;
 }
-
-/* ─── SPINNER ───────────────────────────────────────────────────────── */
-div[data-testid="stSpinner"] { color: #4f8ef7 !important; }
 
 /* ─── EXPANDER ──────────────────────────────────────────────────────── */
 div[data-testid="stExpander"] {
-    background: rgba(6,14,26,0.7) !important;
-    border: 1px solid rgba(255,255,255,0.05) !important;
-    border-radius: 10px !important;
+    background: rgba(5,11,22,0.65) !important;
+    border: 1px solid rgba(255,255,255,0.045) !important;
+    border-radius: 9px !important;
 }
 
 /* ─── SCROLLBAR ─────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #06101c; }
-::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #1e4bd8; }
-
-/* ─── CAMERA CAPTURE SECTION ────────────────────────────────────────── */
-.camera-card {
-    background: rgba(6,14,26,0.7);
-    border: 1.5px dashed rgba(79,142,247,0.2);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-top: 0.5rem;
-    text-align: center;
-}
-.camera-card-title {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #475569;
-    margin-bottom: 0.5rem;
-}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #070e1a; }
+::-webkit-scrollbar-thumb { background: #1a2a40; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #1a43cc; }
 
 /* ─── MOBILE ────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-    .block-container { padding: 1rem 0.85rem 2.5rem !important; }
-    .section-card { padding: 1.1rem 1rem; }
-    .servicos-strip { flex-wrap: nowrap; }
-    .bsb-wordmark-line1 { font-size: clamp(2.2rem, 10vw, 3rem); }
-    .step-label { font-size: 0.52rem; }
+    .block-container { padding: 0.9rem 0.8rem 2.5rem !important; }
+    .section-card { padding: 1rem 0.9rem; }
+    .bsb-wordmark { font-size: clamp(1.9rem, 9vw, 2.6rem); }
+    .step-label { font-size: 0.5rem; }
+    .srv-strip { flex-wrap: nowrap; }
 }
 
-/* ─── HIDE STREAMLIT CHROME ─────────────────────────────────────────── */
+/* ─── HIDE CHROME ───────────────────────────────────────────────────── */
 #MainMenu, footer, header { visibility: hidden; }
 div[data-testid="stDecoration"] { display: none; }
-.stApp > div:first-child [data-testid="stToolbar"] { display: none; }
 </style>
 """, unsafe_allow_html=True)
 
 
 # =============================================================================
-# INICIALIZAÇÃO DO ESTADO
+# ESTADO
 # =============================================================================
 def init_session_state():
     defaults = {
-        'step': 0,
-        'perfil': None,
-        'dados_cadastrais': {},
-        'dados_operacionais': {},
-        'dados_socio': {},
-        'documentos': [],
-        'honorario_interno': 0.0,
+        'step': 0, 'perfil': None,
+        'dados_cadastrais': {}, 'dados_operacionais': {},
+        'documentos': [], 'honorario_interno': 0.0,
         'cnpj_consultado': False,
-        'cep_consultado': False,
-        'submitted': False,
     }
-    for key, value in defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = value
+    for k, v in defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
 init_session_state()
 
 
 # =============================================================================
-# LISTAS DE OPÇÕES — CAMPOS COM SUGESTÕES
+# LISTAS
 # =============================================================================
 PROFISSOES = [
     "Administrador(a)", "Advogado(a)", "Agente de Saúde", "Analista de Sistemas",
@@ -572,178 +504,276 @@ PROFISSOES = [
 ]
 
 SEGMENTOS_PJ = [
-    "Agropecuária / Agricultura",
-    "Alimentação / Restaurante / Delivery",
-    "Comércio Varejista",
-    "Comércio Atacadista",
-    "Construção Civil / Incorporação",
-    "Consultoria / Assessoria",
-    "Educação / Treinamento",
-    "Estética / Saúde / Bem-estar",
-    "Indústria / Manufatura",
-    "Logística / Transporte",
-    "Saúde / Clínica / Laboratório",
-    "Serviços em Geral",
-    "Tecnologia / Software / SaaS",
-    "Turismo / Hotelaria",
-    "Outro"
+    "Agropecuária / Agricultura", "Alimentação / Restaurante / Delivery",
+    "Comércio Varejista", "Comércio Atacadista",
+    "Construção Civil / Incorporação", "Consultoria / Assessoria",
+    "Educação / Treinamento", "Estética / Saúde / Bem-estar",
+    "Indústria / Manufatura", "Logística / Transporte",
+    "Saúde / Clínica / Laboratório", "Serviços em Geral",
+    "Tecnologia / Software / SaaS", "Turismo / Hotelaria", "Outro"
 ]
 
+ESTADOS = [
+    "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
+    "MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN",
+    "RS","RO","RR","SC","SP","SE","TO"
+]
+
+
 # =============================================================================
-# APIs AUXILIARES
+# APIs
 # =============================================================================
 @st.cache_data(ttl=600, show_spinner=False)
 def consulta_cnpj(cnpj: str) -> Optional[Dict]:
-    cnpj_clean = re.sub(r'\D', '', cnpj)
-    if len(cnpj_clean) != 14:
-        return None
+    c = re.sub(r'\D', '', cnpj)
+    if len(c) != 14: return None
     try:
-        resp = requests.get(
-            f"https://brasilapi.com.br/api/cnpj/v1/{cnpj_clean}",
-            timeout=12,
-            headers={"User-Agent": "BSB-Contabilidade/3.0"}
-        )
-        resp.raise_for_status()
-        return resp.json()
-    except Exception:
-        return None
+        r = requests.get(f"https://brasilapi.com.br/api/cnpj/v1/{c}",
+                         timeout=12, headers={"User-Agent": "BSB/4.0"})
+        r.raise_for_status(); return r.json()
+    except: return None
 
 
 @st.cache_data(ttl=600, show_spinner=False)
 def consulta_cep(cep: str) -> Optional[Dict]:
-    cep_clean = re.sub(r'\D', '', cep)
-    if len(cep_clean) != 8:
-        return None
+    c = re.sub(r'\D', '', cep)
+    if len(c) != 8: return None
     try:
-        resp = requests.get(
-            f"https://brasilapi.com.br/api/cep/v2/{cep_clean}",
-            timeout=10,
-            headers={"User-Agent": "BSB-Contabilidade/3.0"}
-        )
-        resp.raise_for_status()
-        return resp.json()
-    except Exception:
-        return None
+        r = requests.get(f"https://brasilapi.com.br/api/cep/v2/{c}",
+                         timeout=10, headers={"User-Agent": "BSB/4.0"})
+        r.raise_for_status(); return r.json()
+    except: return None
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def consulta_cnae(codigo: str) -> str:
-    if not codigo:
-        return ""
-    codigo_clean = re.sub(r'\D', '', str(codigo))
+    c = re.sub(r'\D', '', str(codigo))
+    if not c: return ""
     try:
-        resp = requests.get(
-            f"https://brasilapi.com.br/api/cnae/v1/{codigo_clean}",
-            timeout=10
-        )
-        resp.raise_for_status()
-        return resp.json().get('descricao', '')
-    except Exception:
-        return ""
-
-
-def lista_estados() -> list:
-    return [
-        "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
-        "MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN",
-        "RS","RO","RR","SC","SP","SE","TO"
-    ]
+        r = requests.get(f"https://brasilapi.com.br/api/cnae/v1/{c}", timeout=10)
+        r.raise_for_status(); return r.json().get('descricao', '')
+    except: return ""
 
 
 # =============================================================================
-# VALIDAÇÕES
+# VALIDAÇÕES E FORMATAÇÕES
 # =============================================================================
 def validar_cnpj(cnpj: str) -> bool:
-    cnpj = re.sub(r'\D', '', cnpj)
-    if len(cnpj) != 14 or cnpj == cnpj[0] * 14:
-        return False
-    def calc(cnpj, p):
-        s = sum(int(cnpj[i]) * p[i] for i in range(len(p)))
-        r = s % 11
-        return 0 if r < 2 else 11 - r
-    d1 = calc(cnpj, [5,4,3,2,9,8,7,6,5,4,3,2])
-    d2 = calc(cnpj, [6,5,4,3,2,9,8,7,6,5,4,3,2])
-    return cnpj[-2:] == f"{d1}{d2}"
-
+    c = re.sub(r'\D', '', cnpj)
+    if len(c) != 14 or c == c[0]*14: return False
+    def dig(c, p):
+        s = sum(int(c[i])*p[i] for i in range(len(p))); r = s%11
+        return 0 if r < 2 else 11-r
+    return c[-2:] == f"{dig(c,[5,4,3,2,9,8,7,6,5,4,3,2])}{dig(c,[6,5,4,3,2,9,8,7,6,5,4,3,2])}"
 
 def validar_cpf(cpf: str) -> bool:
-    cpf = re.sub(r'\D', '', cpf)
-    if len(cpf) != 11 or cpf == cpf[0] * 11:
-        return False
-    def calc(cpf, p):
-        s = sum(int(cpf[i]) * (p - i) for i in range(p - 1))
-        r = (s * 10) % 11
+    c = re.sub(r'\D', '', cpf)
+    if len(c) != 11 or c == c[0]*11: return False
+    def dig(c, p):
+        s = sum(int(c[i])*(p-i) for i in range(p-1)); r=(s*10)%11
         return 0 if r >= 10 else r
-    return int(cpf[9]) == calc(cpf, 10) and int(cpf[10]) == calc(cpf, 11)
-
+    return int(c[9])==dig(c,10) and int(c[10])==dig(c,11)
 
 def validar_email(e: str) -> bool:
     return bool(re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', e))
 
-
 def validar_telefone(t: str) -> bool:
-    return len(re.sub(r'\D', '', t)) in [10, 11]
+    return len(re.sub(r'\D','',t)) in [10,11]
 
+def fmt_cnpj(c: str) -> str:
+    c=re.sub(r'\D','',c)
+    return f"{c[:2]}.{c[2:5]}.{c[5:8]}/{c[8:12]}-{c[12:]}" if len(c)==14 else c
 
-def formatar_cnpj(c: str) -> str:
-    c = re.sub(r'\D', '', c)
-    return f"{c[:2]}.{c[2:5]}.{c[5:8]}/{c[8:12]}-{c[12:]}" if len(c) == 14 else c
+def fmt_cpf(c: str) -> str:
+    c=re.sub(r'\D','',c)
+    return f"{c[:3]}.{c[3:6]}.{c[6:9]}-{c[9:]}" if len(c)==11 else c
 
+def fmt_cep(c: str) -> str:
+    c=re.sub(r'\D','',c)
+    return f"{c[:5]}-{c[5:]}" if len(c)==8 else c
 
-def formatar_cpf(c: str) -> str:
-    c = re.sub(r'\D', '', c)
-    return f"{c[:3]}.{c[3:6]}.{c[6:9]}-{c[9:]}" if len(c) == 11 else c
-
-
-def formatar_cep(c: str) -> str:
-    c = re.sub(r'\D', '', c)
-    return f"{c[:5]}-{c[5:]}" if len(c) == 8 else c
-
-
-def formatar_telefone(t: str) -> str:
-    t = re.sub(r'\D', '', t)
-    if len(t) == 11: return f"({t[:2]}) {t[2:7]}-{t[7:]}"
-    if len(t) == 10: return f"({t[:2]}) {t[2:6]}-{t[6:]}"
+def fmt_tel(t: str) -> str:
+    t=re.sub(r'\D','',t)
+    if len(t)==11: return f"({t[:2]}) {t[2:7]}-{t[7:]}"
+    if len(t)==10: return f"({t[:2]}) {t[2:6]}-{t[6:]}"
     return t
 
+def fmt_moeda(v: float) -> str:
+    return f"R$ {v:,.2f}".replace(',','X').replace('.',',').replace('X','.')
 
-# =============================================================================
-# CÁLCULO DE HONORÁRIOS — INTERNO
-# =============================================================================
-def calcular_honorario_pj(dados: Dict) -> float:
-    regime = dados.get('regime', 'Simples Nacional')
-    fat = float(dados.get('faturamento_mensal', 0))
-    notas = int(dados.get('num_notas', 0))
-    func = int(dados.get('num_funcionarios', 0))
-    est = dados.get('tem_estoque', False)
-    sit = dados.get('situacao_fiscal', 'regular')
-    filiais = int(dados.get('num_filiais', 0))
-    imp_ext = dados.get('importa_exporta', False)
-    base = {'MEI': 180, 'Simples Nacional': 650, 'Lucro Presumido': 1400, 'Lucro Real': 2600}.get(regime, 650)
-    ff = 0.8 if fat <= 10000 else (1.0 if fat <= 30000 else (1.35 if fat <= 100000 else (1.7 if fat <= 300000 else (2.2 if fat <= 1000000 else 3.0))))
-    add = (notas // 20) * 90 + min(func * 55, 1500) + (250 if est else 0) + filiais * 400 + (500 if imp_ext else 0)
-    return round((base * ff + add) * (1.35 if sit == 'irregular' else 1.0), 2)
-
-
-def calcular_honorario_pf(dados: Dict) -> float:
-    renda = float(dados.get('renda_mensal', 0))
-    ff = 1.0 if renda <= 5000 else (1.5 if renda <= 15000 else (2.0 if renda <= 50000 else 2.8))
-    extras = (120 if dados.get('possui_bens') else 0) + (180 if dados.get('possui_investimentos') else 0) + (300 if dados.get('renda_exterior') else 0) + (150 if dados.get('autonomo') else 0)
-    return round(250 * ff + extras, 2)
+def fmt_data_br(d) -> str:
+    """Converte date ou string ISO para DD/MM/AAAA."""
+    if isinstance(d, date):
+        return d.strftime('%d/%m/%Y')
+    if isinstance(d, str):
+        for fmt in ('%Y-%m-%d', '%d/%m/%Y', '%Y/%m/%d'):
+            try: return datetime.strptime(d, fmt).strftime('%d/%m/%Y')
+            except: pass
+    return str(d)
 
 
 # =============================================================================
-# COMPONENTES VISUAIS
+# HONORÁRIOS — INTERNO
+# =============================================================================
+def calcular_honorario_pj(d: Dict) -> float:
+    base = {'MEI':180,'Simples Nacional':650,'Lucro Presumido':1400,'Lucro Real':2600}.get(d.get('regime','Simples Nacional'),650)
+    fat = float(d.get('faturamento_mensal',0))
+    ff = 0.8 if fat<=10000 else (1.0 if fat<=30000 else (1.35 if fat<=100000 else (1.7 if fat<=300000 else (2.2 if fat<=1000000 else 3.0))))
+    add = (int(d.get('num_notas',0))//20)*90 + min(int(d.get('num_funcionarios',0))*55,1500) + (250 if d.get('tem_estoque') else 0) + int(d.get('num_filiais',0))*400 + (500 if d.get('importa_exporta') else 0)
+    return round((base*ff+add)*(1.35 if d.get('situacao_fiscal')=='irregular' else 1.0), 2)
+
+def calcular_honorario_pf(d: Dict) -> float:
+    r=float(d.get('renda_mensal',0))
+    ff=1.0 if r<=5000 else (1.5 if r<=15000 else (2.0 if r<=50000 else 2.8))
+    ex=(120 if d.get('possui_bens') else 0)+(180 if d.get('possui_investimentos') else 0)+(300 if d.get('renda_exterior') else 0)+(150 if d.get('autonomo') else 0)
+    return round(250*ff+ex, 2)
+
+
+# =============================================================================
+# FICHA DE CADASTRO — geração de texto estruturado para download
+# =============================================================================
+def gerar_ficha_texto() -> str:
+    dc = st.session_state.dados_cadastrais
+    op = st.session_state.dados_operacionais
+    perf = st.session_state.perfil
+    agora = datetime.now().strftime('%d/%m/%Y %H:%M')
+
+    linhas = []
+    SEP  = "=" * 56
+    SEP2 = "-" * 56
+
+    linhas += [
+        SEP,
+        "  BSB CONTABILIDADE — FICHA DE CADASTRO",
+        f"  Gerado em: {agora}",
+        SEP, ""
+    ]
+
+    if perf == 'PJ':
+        linhas += [
+            "DADOS DA EMPRESA",
+            SEP2,
+            f"Razão Social .....: {dc.get('razao_social','—')}",
+            f"Nome Fantasia ....: {dc.get('nome_fantasia','—')}",
+            f"CNPJ .............: {dc.get('cnpj','—')}",
+            f"Natureza Jurídica : {dc.get('natureza_juridica','—')}",
+            f"Situação Cadastral: {dc.get('situacao','—')}",
+            f"Data de Abertura .: {dc.get('data_abertura','—')}",
+            f"Porte ............: {dc.get('porte','—')}",
+            f"Capital Social ...: {fmt_moeda(float(dc.get('capital_social',0)))}",
+            f"Segmento .........: {dc.get('segmento','—')}",
+            f"CNAE Principal ...: {dc.get('cnae_principal_desc','—')} ({dc.get('cnae_principal_cod','—')})",
+            "",
+        ]
+        if dc.get('cnaes_secundarios'):
+            linhas.append("CNAEs Secundários.:")
+            for c in dc['cnaes_secundarios']:
+                linhas.append(f"  • {c}")
+            linhas.append("")
+        if dc.get('socios'):
+            linhas.append("Quadro Societário.:")
+            for s in dc['socios']:
+                linhas.append(f"  • {s.get('nome','—')} — {s.get('qualificacao','—')}")
+            linhas.append("")
+    else:
+        linhas += [
+            "DADOS PESSOAIS",
+            SEP2,
+            f"Nome Completo ....: {dc.get('nome','—')}",
+            f"CPF ..............: {dc.get('cpf','—')}",
+            f"Data de Nascimento: {fmt_data_br(dc.get('data_nascimento','—'))}",
+            f"Estado Civil .....: {dc.get('estado_civil','—')}",
+            f"Profissão ........: {dc.get('profissao','—')}",
+            f"Nacionalidade ....: {dc.get('nacionalidade','—')}",
+            "",
+        ]
+
+    linhas += [
+        "ENDEREÇO",
+        SEP2,
+        f"CEP ..............: {dc.get('cep','—')}",
+        f"Logradouro .......: {dc.get('logradouro','—')}, {dc.get('numero','s/n')}",
+        f"Complemento ......: {dc.get('complemento','—')}",
+        f"Bairro ...........: {dc.get('bairro','—')}",
+        f"Município/UF .....: {dc.get('municipio','—')} / {dc.get('uf','—')}",
+        "",
+    ]
+
+    if perf == 'PJ':
+        linhas += [
+            "PERFIL FISCAL",
+            SEP2,
+            f"Regime Tributário : {op.get('regime','—')}",
+            f"Faturamento Médio : {fmt_moeda(float(op.get('faturamento_mensal',0)))} / mês",
+            f"Notas Fiscais/mês : {op.get('num_notas','—')}",
+            f"Funcionários .....: {op.get('num_funcionarios',0)}",
+            f"Filiais ..........: {op.get('num_filiais',0)}",
+            f"Estoque ..........: {'Sim' if op.get('tem_estoque') else 'Não'}",
+            f"Importa/Exporta ..: {'Sim' if op.get('importa_exporta') else 'Não'}",
+            f"Situação Fiscal ..: {'Com pendências' if op.get('situacao_fiscal')=='irregular' else 'Em dia'}",
+            f"Contador Atual ...: {op.get('contabilidade_atual','—')}",
+            "",
+        ]
+    else:
+        linhas += [
+            "PERFIL FINANCEIRO",
+            SEP2,
+            f"Renda Mensal .....: {fmt_moeda(float(op.get('renda_mensal',0)))}",
+            f"Bens Imóveis .....: {'Sim' if op.get('possui_bens') else 'Não'}",
+            f"Investimentos ....: {'Sim' if op.get('possui_investimentos') else 'Não'}",
+            f"Renda Exterior ...: {'Sim' if op.get('renda_exterior') else 'Não'}",
+            f"Autônomo .........: {'Sim' if op.get('autonomo') else 'Não'}",
+            f"Sócio de Empresa .: {'Sim' if op.get('socio_empresa') else 'Não'}",
+            f"Pensão Alimentícia: {'Sim' if op.get('pensao') else 'Não'}",
+            f"Herança/Doação ...: {'Sim' if op.get('heranca') else 'Não'}",
+            f"Tipo Declaração ..: {op.get('tipo_declaracao','—')}",
+            "",
+        ]
+
+    servicos = op.get('tipo_servico', [])
+    if servicos:
+        linhas += ["SERVIÇOS SOLICITADOS", SEP2]
+        for s in servicos: linhas.append(f"  ✓ {s}")
+        linhas.append("")
+
+    contato_nome = op.get('contato_nome', dc.get('nome', '—'))
+    linhas += [
+        "CONTATO",
+        SEP2,
+        f"Responsável ......: {contato_nome}",
+        f"E-mail ...........: {op.get('contato_email','—')}",
+        f"Telefone/WhatsApp : {op.get('contato_telefone','—')}",
+        f"Início Desejado ..: {op.get('expectativa','—')}",
+    ]
+    if op.get('observacoes','').strip():
+        linhas += ["", f"Observações ......: {op.get('observacoes','')}"]
+
+    n_docs = len(st.session_state.documentos)
+    linhas += [
+        "",
+        "DOCUMENTOS",
+        SEP2,
+        f"Documentos anexados: {n_docs} arquivo(s)",
+        "",
+        SEP,
+        "  BSB Contabilidade — Brasília · DF",
+        "  Este documento é de uso exclusivo do escritório.",
+        SEP,
+    ]
+    return "\n".join(linhas)
+
+
+# =============================================================================
+# COMPONENTES DE UI
 # =============================================================================
 def render_hero():
-    """Hero com wordmark tipográfico refinado + cards animados de serviços."""
     st.markdown("""
     <div class="hero-wrapper">
-        <span class="bsb-wordmark-line1">BSB Contabilidade</span>
-        <span class="bsb-wordmark-line2">Brasília · DF</span>
+        <span class="bsb-wordmark">BSB Contabilidade</span>
+        <span class="bsb-sub">Brasília · DF</span>
         <div class="bsb-slogan">Inteligência fiscal para acelerar seu futuro.</div>
     </div>
-    <div class="servicos-strip">
+    <div class="srv-strip">
         <div class="srv-card">
             <span class="srv-icon">🏛️</span>
             <div class="srv-title">Contabilidade</div>
@@ -752,7 +782,7 @@ def render_hero():
         <div class="srv-card">
             <span class="srv-icon">📊</span>
             <div class="srv-title">Tributário</div>
-            <div class="srv-desc">Planejamento e economia fiscal</div>
+            <div class="srv-desc">Planejamento e economia</div>
         </div>
         <div class="srv-card">
             <span class="srv-icon">🧾</span>
@@ -774,34 +804,34 @@ def render_lgpd():
         <div class="lgpd-icon">🔒</div>
         <div class="lgpd-text">
             <strong>LGPD — Lei 13.709/2018:</strong>
-            Seus dados são <strong>confidenciais</strong> e utilizados exclusivamente para elaboração
-            de proposta de serviços. Não compartilhamos com terceiros.
+            Seus dados são <strong>confidenciais</strong> e utilizados exclusivamente
+            para elaboração de proposta de serviços. Não compartilhamos com terceiros.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 
-def render_step_indicator(current_step: int):
-    steps = [("1", "Perfil"), ("2", "Cadastro"), ("3", "Fiscal"), ("4", "Docs")]
-    html = '<div class="step-track">'
-    for i, (num, label) in enumerate(steps):
-        step_num = i + 1
-        if step_num < current_step:
-            css, label_css, icon = "done", "", "✓"
-        elif step_num == current_step:
-            css, label_css, icon = "active", "active", num
-        else:
-            css, label_css, icon = "pending", "", num
-        html += f'<div class="step-node"><div class="step-circle {css}">{icon}</div><span class="step-label {label_css}">{label}</span></div>'
-        if i < len(steps) - 1:
-            conn = "done" if step_num < current_step else ""
-            html += f'<div class="step-connector {conn}"></div>'
-    html += '</div>'
-    st.markdown(html, unsafe_allow_html=True)
+def render_steps(current: int):
+    steps = [("1","Perfil"),("2","Cadastro"),("3","Fiscal"),("4","Docs")]
+    h = '<div class="step-track">'
+    for i,(num,lbl) in enumerate(steps):
+        n = i+1
+        if n < current:   css,lcss,ico = "done","","✓"
+        elif n == current: css,lcss,ico = "active","active",num
+        else:              css,lcss,ico = "pending","",num
+        h += f'<div class="step-node"><div class="step-circle {css}">{ico}</div><span class="step-label {lcss}">{lbl}</span></div>'
+        if i < 3:
+            h += f'<div class="step-connector {"done" if n < current else ""}"></div>'
+    h += '</div>'
+    st.markdown(h, unsafe_allow_html=True)
 
 
-def card_title(icon: str, text: str):
-    st.markdown(f'<div class="card-title"><span class="card-title-icon">{icon}</span>{text}</div>', unsafe_allow_html=True)
+def ctitle(icon: str, text: str):
+    st.markdown(f'<div class="card-title"><span class="ct-icon">{icon}</span>{text}</div>', unsafe_allow_html=True)
+
+
+def badge(text: str):
+    st.markdown(f'<div class="auto-badge">{text}</div>', unsafe_allow_html=True)
 
 
 # =============================================================================
@@ -810,53 +840,34 @@ def card_title(icon: str, text: str):
 def main():
     render_hero()
     render_lgpd()
-    current_step = st.session_state.step
-    render_step_indicator(max(current_step, 1))
-
-    if current_step == 0:
-        etapa_selecao_perfil()
-    elif current_step == 1:
-        etapa_dados_cadastrais()
-    elif current_step == 2:
-        etapa_dados_operacionais()
-    elif current_step == 3:
-        etapa_upload()
-    elif current_step == 4:
-        etapa_sucesso()
+    step = st.session_state.step
+    render_steps(max(step, 1))
+    {0: etapa_perfil, 1: etapa_cadastral, 2: etapa_fiscal,
+     3: etapa_docs,   4: etapa_sucesso}.get(step, etapa_perfil)()
 
 
 # =============================================================================
-# ETAPA 0 — SELEÇÃO DE PERFIL
+# ETAPA 0 — PERFIL
 # =============================================================================
-def etapa_selecao_perfil():
-    st.markdown("""
-    <div class="section-card">
-    """, unsafe_allow_html=True)
-    card_title("🚀", "Como você deseja ser atendido?")
-    st.markdown("""
-    <p style="font-size:0.8rem; color:#334155; margin-bottom:1.1rem; line-height:1.5;">
-        Selecione o perfil que melhor descreve sua necessidade para que possamos personalizar sua proposta.
-    </p>
-    </div>
-    """, unsafe_allow_html=True)
+def etapa_perfil():
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    ctitle("🚀", "Como deseja ser atendido?")
+    st.markdown('<p style="font-size:0.78rem;color:#2d3f58;margin-bottom:1rem;line-height:1.5;">Selecione o perfil para personalizarmos sua proposta.</p>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
+    c1, c2 = st.columns(2)
+    with c1:
         if st.button("🏢  Pessoa Jurídica\nEmpresas · MEI · Startups", use_container_width=True):
-            st.session_state.perfil = 'PJ'
-            st.session_state.step = 1
-            st.rerun()
-    with col2:
+            st.session_state.perfil = 'PJ'; st.session_state.step = 1; st.rerun()
+    with c2:
         if st.button("👤  Pessoa Física\nAutônomos · Profissionais · IR", use_container_width=True):
-            st.session_state.perfil = 'PF'
-            st.session_state.step = 1
-            st.rerun()
+            st.session_state.perfil = 'PF'; st.session_state.step = 1; st.rerun()
 
     st.markdown("""
-    <div style="margin-top:1rem;padding:10px 14px;background:rgba(79,142,247,0.04);border-radius:9px;border:1px solid rgba(79,142,247,0.10);">
-        <p style="font-size:0.76rem;color:#334155;margin:0;text-align:center;line-height:1.55;">
-            ⏱ Preenchimento em <strong style="color:#4f8ef7">3 a 5 minutos</strong> ·
-            Proposta personalizada em até <strong style="color:#4f8ef7">24 horas úteis</strong>
+    <div style="margin-top:0.9rem;padding:9px 12px;background:rgba(58,123,213,0.04);border-radius:8px;border:1px solid rgba(58,123,213,0.09);">
+        <p style="font-size:0.74rem;color:#2d3f58;margin:0;text-align:center;line-height:1.55;">
+            ⏱ Preenchimento em <strong style="color:#5ba3f5">3 a 5 minutos</strong> ·
+            Proposta em até <strong style="color:#5ba3f5">24 horas úteis</strong>
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -865,588 +876,518 @@ def etapa_selecao_perfil():
 # =============================================================================
 # ETAPA 1 — DADOS CADASTRAIS
 # =============================================================================
-def etapa_dados_cadastrais():
-    if st.session_state.perfil == 'PJ':
-        _etapa_cadastral_pj(st.session_state.dados_cadastrais)
-    else:
-        _etapa_cadastral_pf(st.session_state.dados_cadastrais)
+def etapa_cadastral():
+    if st.session_state.perfil == 'PJ': _cadastral_pj()
+    else: _cadastral_pf()
 
 
-def _etapa_cadastral_pj(dados: Dict):
-    # ── Card: Dados da Empresa ──────────────────────────────────────────
+def _cadastral_pj():
+    dc = st.session_state.dados_cadastrais
+
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("🏢", "Dados da Empresa")
+    ctitle("🏢", "Dados da Empresa")
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        cnpj_input = st.text_input("CNPJ *", value=dados.get('cnpj', ''), placeholder="00.000.000/0000-00", key='cnpj_input')
-    with col2:
+    # CNPJ
+    c1, c2 = st.columns([3,1])
+    with c1: cnpj_v = st.text_input("CNPJ *", value=dc.get('cnpj',''), placeholder="00.000.000/0000-00", key='k_cnpj')
+    with c2:
         st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        consultar = st.button("🔍 Buscar", use_container_width=True, type="secondary", key='btn_cnpj')
-
-    if consultar:
-        cnpj_clean = re.sub(r'\D', '', cnpj_input)
-        if not validar_cnpj(cnpj_clean):
-            st.error("❌ CNPJ inválido. Verifique os dígitos.")
-        else:
-            with st.spinner("Consultando Receita Federal..."):
-                resultado = consulta_cnpj(cnpj_clean)
-            if resultado:
-                cnae_desc = resultado.get('cnae_fiscal_descricao', '')
-                cnae_cod = str(resultado.get('cnae_fiscal', ''))
-                if not cnae_desc and cnae_cod:
-                    cnae_desc = consulta_cnae(cnae_cod)
-                cnaes_sec = resultado.get('cnaes_secundarios', [])
-                socios = resultado.get('qsa', [])
-
-                # Natureza jurídica — trata dict ou string
-                nj = resultado.get('natureza_juridica', '')
-                if isinstance(nj, dict):
-                    nj = nj.get('descricao', '')
-
-                st.session_state.dados_cadastrais.update({
-                    'cnpj': formatar_cnpj(cnpj_clean),
-                    'razao_social': resultado.get('razao_social', ''),
-                    'nome_fantasia': resultado.get('nome_fantasia', '') or resultado.get('razao_social', ''),
-                    'natureza_juridica': resultado.get('descricao_natureza_juridica', '') or nj,
-                    'situacao': resultado.get('descricao_situacao_cadastral', '') or str(resultado.get('situacao_cadastral', '')),
-                    'data_abertura': resultado.get('data_inicio_atividade', '') or resultado.get('data_abertura', ''),
-                    'porte': resultado.get('descricao_porte', '') or resultado.get('porte', ''),
-                    'capital_social': resultado.get('capital_social', 0),
-                    'cnae_principal_cod': cnae_cod,
-                    'cnae_principal_desc': cnae_desc,
-                    'cnaes_secundarios': [f"{c.get('codigo','')}: {c.get('descricao','')}" for c in cnaes_sec[:5]],
-                    'socios': [{'nome': s.get('nome_socio',''), 'qualificacao': s.get('qualificacao_socio',''), 'faixa_etaria': s.get('faixa_etaria','')} for s in socios],
-                    'email_receita': resultado.get('email', ''),
-                    'cep': resultado.get('cep', ''),
-                    'logradouro': resultado.get('logradouro', ''),
-                    'numero': resultado.get('numero', ''),
-                    'complemento': resultado.get('complemento', ''),
-                    'bairro': resultado.get('bairro', ''),
-                    'municipio': resultado.get('municipio', ''),
-                    'uf': resultado.get('uf', ''),
-                })
-                st.session_state.cnpj_consultado = True
-                st.success("✅ Empresa localizada — campos preenchidos automaticamente.")
-                st.rerun()
+        if st.button("🔍 Buscar", use_container_width=True, type="secondary", key='btn_cnpj'):
+            limpo = re.sub(r'\D','',cnpj_v)
+            if not validar_cnpj(limpo):
+                st.error("❌ CNPJ inválido.")
             else:
-                st.error("❌ CNPJ não encontrado ou serviço temporariamente indisponível. Preencha manualmente.")
+                with st.spinner("Consultando Receita Federal..."):
+                    res = consulta_cnpj(limpo)
+                if res:
+                    nj = res.get('natureza_juridica','')
+                    if isinstance(nj, dict): nj = nj.get('descricao','')
+                    desc_cnae = res.get('cnae_fiscal_descricao','')
+                    cod_cnae  = str(res.get('cnae_fiscal',''))
+                    if not desc_cnae and cod_cnae: desc_cnae = consulta_cnae(cod_cnae)
+                    cnaes_s = res.get('cnaes_secundarios',[])
+                    socios  = res.get('qsa',[])
+                    st.session_state.dados_cadastrais.update({
+                        'cnpj': fmt_cnpj(limpo),
+                        'razao_social': res.get('razao_social',''),
+                        'nome_fantasia': res.get('nome_fantasia','') or res.get('razao_social',''),
+                        'natureza_juridica': res.get('descricao_natureza_juridica','') or nj,
+                        'situacao': res.get('descricao_situacao_cadastral','') or str(res.get('situacao_cadastral','')),
+                        'data_abertura': res.get('data_inicio_atividade','') or res.get('data_abertura',''),
+                        'porte': res.get('descricao_porte','') or res.get('porte',''),
+                        'capital_social': res.get('capital_social',0),
+                        'cnae_principal_cod': cod_cnae, 'cnae_principal_desc': desc_cnae,
+                        'cnaes_secundarios': [f"{c.get('codigo','')}: {c.get('descricao','')}" for c in cnaes_s[:5]],
+                        'socios': [{'nome':s.get('nome_socio',''),'qualificacao':s.get('qualificacao_socio',''),'faixa_etaria':s.get('faixa_etaria','')} for s in socios],
+                        'cep': res.get('cep',''), 'logradouro': res.get('logradouro',''),
+                        'numero': res.get('numero',''), 'complemento': res.get('complemento',''),
+                        'bairro': res.get('bairro',''), 'municipio': res.get('municipio',''), 'uf': res.get('uf',''),
+                    })
+                    st.session_state.cnpj_consultado = True
+                    st.success("✅ Empresa localizada — campos preenchidos automaticamente.")
+                    st.rerun()
+                else:
+                    st.error("❌ CNPJ não encontrado. Preencha manualmente.")
 
-    if st.session_state.get('cnpj_consultado'):
-        st.markdown('<div class="auto-badge">⚡ Preenchido via Receita Federal</div>', unsafe_allow_html=True)
+    if st.session_state.get('cnpj_consultado'): badge("⚡ Dados via Receita Federal")
+    dc = st.session_state.dados_cadastrais
 
-    dados = st.session_state.dados_cadastrais
+    c1, c2 = st.columns(2)
+    with c1:
+        razao   = st.text_input("Razão Social *",     value=dc.get('razao_social',''))
+        fantasia= st.text_input("Nome Fantasia",       value=dc.get('nome_fantasia',''))
+        nat_jur = st.text_input("Natureza Jurídica",   value=dc.get('natureza_juridica',''))
+        situacao= st.text_input("Situação Cadastral",  value=dc.get('situacao',''))
+    with c2:
+        abertura= st.text_input("Data de Abertura",    value=dc.get('data_abertura',''))
+        porte   = st.text_input("Porte da Empresa",    value=dc.get('porte',''))
+        capital = st.number_input("Capital Social (R$)", value=float(dc.get('capital_social',0)), min_value=0.0, step=1000.0, format="%.2f")
+        seg_idx = SEGMENTOS_PJ.index(dc.get('segmento','')) if dc.get('segmento') in SEGMENTOS_PJ else 0
+        segmento= st.selectbox("Segmento / Setor", [""] + SEGMENTOS_PJ, index=seg_idx if dc.get('segmento') else 0)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        razao_social = st.text_input("Razão Social *", value=dados.get('razao_social', ''))
-        nome_fantasia = st.text_input("Nome Fantasia", value=dados.get('nome_fantasia', ''))
-        natureza_juridica = st.text_input("Natureza Jurídica", value=dados.get('natureza_juridica', ''))
-        situacao = st.text_input("Situação Cadastral", value=dados.get('situacao', ''))
-    with col2:
-        data_abertura = st.text_input("Data de Abertura", value=dados.get('data_abertura', ''))
-        porte = st.text_input("Porte da Empresa", value=dados.get('porte', ''))
-        capital_social = st.number_input("Capital Social (R$)", value=float(dados.get('capital_social', 0)), min_value=0.0, step=1000.0, format="%.2f")
-        segmento = st.selectbox(
-            "Segmento / Setor",
-            [""] + SEGMENTOS_PJ,
-            index=SEGMENTOS_PJ.index(dados.get('segmento', '')) + 1 if dados.get('segmento') in SEGMENTOS_PJ else 0
-        )
+    c1, c2 = st.columns(2)
+    with c1: cnae_d = st.text_input("CNAE Principal", value=dc.get('cnae_principal_desc',''))
+    with c2: cnae_c = st.text_input("Código CNAE",    value=dc.get('cnae_principal_cod',''))
 
-    col1, col2 = st.columns(2)
-    with col1:
-        cnae_desc = st.text_input("CNAE Principal", value=dados.get('cnae_principal_desc', ''))
-    with col2:
-        cnae_cod = st.text_input("Código CNAE", value=dados.get('cnae_principal_cod', ''))
-
-    if dados.get('cnaes_secundarios'):
+    if dc.get('cnaes_secundarios'):
         with st.expander("📋 CNAEs Secundários"):
-            for c in dados['cnaes_secundarios']:
-                st.markdown(f"<div style='font-size:0.78rem;color:#64748b;padding:2px 0;'>• {c}</div>", unsafe_allow_html=True)
+            for c in dc['cnaes_secundarios']:
+                st.markdown(f"<div style='font-size:0.76rem;color:#536882;padding:2px 0;'>• {c}</div>", unsafe_allow_html=True)
 
-    if dados.get('socios'):
+    if dc.get('socios'):
         st.markdown('<hr class="divider">', unsafe_allow_html=True)
-        st.markdown('<div class="card-title" style="margin-bottom:0.7rem;"><span class="card-title-icon">👥</span>Quadro Societário</div>', unsafe_allow_html=True)
-        for s in dados['socios']:
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"<div style='font-size:0.82rem;color:#cbd5e1;font-weight:600;'>{s.get('nome','')}</div>", unsafe_allow_html=True)
-                st.markdown(f"<div style='font-size:0.72rem;color:#475569;'>{s.get('qualificacao','')}</div>", unsafe_allow_html=True)
-            with col2:
-                if s.get('faixa_etaria'):
-                    st.markdown(f"<div style='font-size:0.72rem;color:#334155;'>Faixa etária: {s.get('faixa_etaria','')}</div>", unsafe_allow_html=True)
+        st.markdown('<div class="card-title" style="margin-bottom:0.6rem;"><span class="ct-icon">👥</span>Quadro Societário</div>', unsafe_allow_html=True)
+        for s in dc['socios']:
+            st.markdown(f"<div style='font-size:0.8rem;color:#c5d4e5;font-weight:600;'>{s.get('nome','')}</div>"
+                        f"<div style='font-size:0.7rem;color:#3d5069;margin-bottom:4px;'>{s.get('qualificacao','')} {'· '+s.get('faixa_etaria','') if s.get('faixa_etaria') else ''}</div>", unsafe_allow_html=True)
 
     st.session_state.dados_cadastrais.update({
-        'cnpj': cnpj_input,
-        'razao_social': razao_social,
-        'nome_fantasia': nome_fantasia,
-        'natureza_juridica': natureza_juridica,
-        'situacao': situacao,
-        'data_abertura': data_abertura,
-        'porte': porte,
-        'capital_social': capital_social,
-        'segmento': segmento,
-        'cnae_principal_cod': cnae_cod,
-        'cnae_principal_desc': cnae_desc,
+        'cnpj': cnpj_v, 'razao_social': razao, 'nome_fantasia': fantasia,
+        'natureza_juridica': nat_jur, 'situacao': situacao, 'data_abertura': abertura,
+        'porte': porte, 'capital_social': capital, 'segmento': segmento,
+        'cnae_principal_cod': cnae_c, 'cnae_principal_desc': cnae_d,
     })
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Card: Endereço ──────────────────────────────────────────────────
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📍", "Endereço")
-    _bloco_endereco(dados, sufixo='pj')
+    ctitle("📍", "Endereço")
+    _bloco_cep('pj')
     st.markdown('</div>', unsafe_allow_html=True)
+    _nav(0, 2, pj=True)
 
-    _botoes_navegacao(0, 2, validar_pj=True)
 
+def _cadastral_pf():
+    dc = st.session_state.dados_cadastrais
 
-def _etapa_cadastral_pf(dados: Dict):
-    # ── Card: Dados Pessoais ────────────────────────────────────────────
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("👤", "Dados Pessoais")
+    ctitle("👤", "Dados Pessoais")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        cpf = st.text_input("CPF *", value=dados.get('cpf', ''), placeholder="000.000.000-00")
-        nome = st.text_input("Nome Completo *", value=dados.get('nome', ''))
-        data_nasc = st.date_input(
+    c1, c2 = st.columns(2)
+    with c1:
+        cpf  = st.text_input("CPF *", value=dc.get('cpf',''), placeholder="000.000.000-00")
+        nome = st.text_input("Nome Completo *", value=dc.get('nome',''))
+        # Data no formato DD/MM/AAAA usando text_input para total controle
+        data_str = st.text_input(
             "Data de Nascimento *",
-            value=datetime.strptime(dados['data_nascimento'], '%d/%m/%Y').date() if dados.get('data_nascimento') else date(1990, 1, 1),
-            min_value=date(1900, 1, 1), max_value=date.today()
+            value=dc.get('data_nascimento', ''),
+            placeholder="DD/MM/AAAA",
+            help="Informe no formato DD/MM/AAAA"
         )
-    with col2:
-        nacionalidade = st.text_input("Nacionalidade", value=dados.get('nacionalidade', 'Brasileira'))
-        estado_civil = st.selectbox(
-            "Estado Civil",
-            ["Solteiro(a)", "Casado(a)", "Separado(a)", "Divorciado(a)", "Viúvo(a)", "União Estável"],
-            index=["Solteiro(a)", "Casado(a)", "Separado(a)", "Divorciado(a)", "Viúvo(a)", "União Estável"].index(dados.get('estado_civil', 'Solteiro(a)')) if dados.get('estado_civil') in ["Solteiro(a)", "Casado(a)", "Separado(a)", "Divorciado(a)", "Viúvo(a)", "União Estável"] else 0
-        )
-        # Profissão como selectbox com opções
-        profissao_idx = PROFISSOES.index(dados.get('profissao', 'Outro')) if dados.get('profissao') in PROFISSOES else len(PROFISSOES) - 1
-        profissao = st.selectbox("Profissão / Ocupação", PROFISSOES, index=profissao_idx)
+    with c2:
+        nac   = st.text_input("Nacionalidade", value=dc.get('nacionalidade','Brasileira'))
+        ecivil_opts = ["Solteiro(a)","Casado(a)","Separado(a)","Divorciado(a)","Viúvo(a)","União Estável"]
+        ecivil= st.selectbox("Estado Civil", ecivil_opts,
+                             index=ecivil_opts.index(dc.get('estado_civil','Solteiro(a)')) if dc.get('estado_civil') in ecivil_opts else 0)
+        prof_idx = PROFISSOES.index(dc.get('profissao','Outro')) if dc.get('profissao') in PROFISSOES else len(PROFISSOES)-1
+        prof  = st.selectbox("Profissão / Ocupação", PROFISSOES, index=prof_idx)
+
+    # Valida formato da data informada
+    data_valida = ''
+    if data_str.strip():
+        try:
+            dt = datetime.strptime(data_str.strip(), '%d/%m/%Y')
+            data_valida = dt.strftime('%d/%m/%Y')
+        except ValueError:
+            st.warning("⚠️ Data inválida — use o formato DD/MM/AAAA")
 
     st.session_state.dados_cadastrais.update({
         'cpf': cpf, 'nome': nome,
-        'data_nascimento': data_nasc.strftime('%d/%m/%Y'),
-        'nacionalidade': nacionalidade,
-        'estado_civil': estado_civil,
-        'profissao': profissao,
+        'data_nascimento': data_valida or dc.get('data_nascimento',''),
+        'nacionalidade': nac, 'estado_civil': ecivil, 'profissao': prof,
     })
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Card: Endereço ──────────────────────────────────────────────────
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📍", "Endereço")
-    _bloco_endereco(dados, sufixo='pf')
+    ctitle("📍", "Endereço")
+    _bloco_cep('pf')
     st.markdown('</div>', unsafe_allow_html=True)
+    _nav(0, 2, pf=True)
 
-    _botoes_navegacao(0, 2, validar_pf=True)
 
-
-def _bloco_endereco(dados: Dict, sufixo: str):
-    """Bloco de endereço reutilizável com busca automática de CEP."""
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        cep_val = st.text_input("CEP *", value=dados.get('cep', ''), placeholder="00000-000", key=f'cep_{sufixo}')
-    with col2:
+def _bloco_cep(sufixo: str):
+    dc = st.session_state.dados_cadastrais
+    c1, c2 = st.columns([3,1])
+    with c1: cep_v = st.text_input("CEP *", value=dc.get('cep',''), placeholder="00000-000", key=f'cep_{sufixo}')
+    with c2:
         st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        buscar = st.button("📍 Buscar", use_container_width=True, type="secondary", key=f'btn_cep_{sufixo}')
-
-    if buscar:
-        cep_clean = re.sub(r'\D', '', cep_val)
-        if len(cep_clean) != 8:
-            st.error("CEP deve ter 8 dígitos.")
-        else:
-            with st.spinner("Buscando endereço..."):
-                ender = consulta_cep(cep_clean)
-            if ender:
-                st.session_state.dados_cadastrais.update({
-                    'cep': formatar_cep(cep_clean),
-                    'logradouro': ender.get('street', '') or ender.get('logradouro', ''),
-                    'bairro': ender.get('neighborhood', '') or ender.get('bairro', ''),
-                    'municipio': ender.get('city', '') or ender.get('localidade', ''),
-                    'uf': ender.get('state', '') or ender.get('uf', ''),
-                })
-                st.success("✅ Endereço encontrado!")
-                st.rerun()
+        if st.button("📍 Buscar", use_container_width=True, type="secondary", key=f'btn_cep_{sufixo}'):
+            c = re.sub(r'\D','',cep_v)
+            if len(c) != 8:
+                st.error("CEP deve ter 8 dígitos.")
             else:
-                st.error("CEP não encontrado. Preencha manualmente.")
+                with st.spinner("Buscando endereço..."):
+                    end = consulta_cep(c)
+                if end:
+                    st.session_state.dados_cadastrais.update({
+                        'cep': fmt_cep(c),
+                        'logradouro': end.get('street','')  or end.get('logradouro',''),
+                        'bairro':     end.get('neighborhood','') or end.get('bairro',''),
+                        'municipio':  end.get('city','')    or end.get('localidade',''),
+                        'uf':         end.get('state','')   or end.get('uf',''),
+                    })
+                    st.success("✅ Endereço preenchido!")
+                    st.rerun()
+                else:
+                    st.error("CEP não encontrado. Preencha manualmente.")
 
-    dados = st.session_state.dados_cadastrais
-    col1, col2 = st.columns(2)
-    with col1:
-        logradouro = st.text_input("Logradouro", value=dados.get('logradouro', ''), key=f'log_{sufixo}')
-        bairro = st.text_input("Bairro", value=dados.get('bairro', ''), key=f'bairro_{sufixo}')
-        municipio = st.text_input("Município", value=dados.get('municipio', ''), key=f'mun_{sufixo}')
-    with col2:
-        numero = st.text_input("Número", value=dados.get('numero', ''), key=f'num_{sufixo}')
-        complemento = st.text_input("Complemento", value=dados.get('complemento', ''), key=f'comp_{sufixo}')
-        estados = lista_estados()
-        uf_default = dados.get('uf', 'DF')
-        uf_idx = estados.index(uf_default) if uf_default in estados else 6
-        uf = st.selectbox("UF", estados, index=uf_idx, key=f'uf_{sufixo}')
+    dc = st.session_state.dados_cadastrais
+    c1, c2 = st.columns(2)
+    with c1:
+        log  = st.text_input("Logradouro",  value=dc.get('logradouro',''), key=f'log_{sufixo}')
+        bairro=st.text_input("Bairro",      value=dc.get('bairro',''),     key=f'bairro_{sufixo}')
+        mun  = st.text_input("Município",   value=dc.get('municipio',''),  key=f'mun_{sufixo}')
+    with c2:
+        num  = st.text_input("Número",      value=dc.get('numero',''),     key=f'num_{sufixo}')
+        comp = st.text_input("Complemento", value=dc.get('complemento',''),key=f'comp_{sufixo}')
+        uf_i = ESTADOS.index(dc.get('uf','DF')) if dc.get('uf','DF') in ESTADOS else 6
+        uf   = st.selectbox("UF", ESTADOS, index=uf_i, key=f'uf_{sufixo}')
 
     st.session_state.dados_cadastrais.update({
-        'cep': cep_val,
-        'logradouro': logradouro, 'numero': numero, 'complemento': complemento,
-        'bairro': bairro, 'municipio': municipio, 'uf': uf,
+        'cep': cep_v, 'logradouro': log, 'numero': num, 'complemento': comp,
+        'bairro': bairro, 'municipio': mun, 'uf': uf,
     })
 
 
-def _botoes_navegacao(voltar_step: int, proximo_step: int, validar_pj=False, validar_pf=False):
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
+def _nav(voltar: int, proximo: int, pj=False, pf=False):
+    st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
         if st.button("⬅  Voltar", use_container_width=True, type="secondary"):
-            st.session_state.step = voltar_step
-            st.rerun()
-    with col2:
+            st.session_state.step = voltar; st.rerun()
+    with c2:
         if st.button("Próximo  ➡", use_container_width=True, type="primary"):
             erros = []
             d = st.session_state.dados_cadastrais
-            if validar_pj:
-                if not validar_cnpj(re.sub(r'\D', '', d.get('cnpj', ''))):
-                    erros.append("CNPJ inválido ou não preenchido.")
-                if not d.get('razao_social', '').strip():
-                    erros.append("Razão Social é obrigatória.")
-            if validar_pf:
-                if not validar_cpf(re.sub(r'\D', '', d.get('cpf', ''))):
-                    erros.append("CPF inválido.")
-                if not d.get('nome', '').strip():
-                    erros.append("Nome completo é obrigatório.")
-            if erros:
-                for e in erros:
-                    st.error(f"❌ {e}")
-            else:
-                st.session_state.step = proximo_step
-                st.rerun()
+            if pj:
+                if not validar_cnpj(re.sub(r'\D','',d.get('cnpj',''))): erros.append("CNPJ inválido ou não preenchido.")
+                if not d.get('razao_social','').strip(): erros.append("Razão Social é obrigatória.")
+            if pf:
+                if not validar_cpf(re.sub(r'\D','',d.get('cpf',''))): erros.append("CPF inválido.")
+                if not d.get('nome','').strip(): erros.append("Nome completo é obrigatório.")
+                if not d.get('data_nascimento',''): erros.append("Data de nascimento obrigatória (DD/MM/AAAA).")
+            for e in erros: st.error(f"❌ {e}")
+            if not erros: st.session_state.step = proximo; st.rerun()
 
 
 # =============================================================================
-# ETAPA 2 — FISCAL / OPERACIONAL
+# ETAPA 2 — FISCAL
 # =============================================================================
-def etapa_dados_operacionais():
-    if st.session_state.perfil == 'PJ':
-        _etapa_fiscal_pj()
-    else:
-        _etapa_fiscal_pf()
+def etapa_fiscal():
+    if st.session_state.perfil == 'PJ': _fiscal_pj()
+    else: _fiscal_pf()
 
 
-def _etapa_fiscal_pj():
+def _fiscal_pj():
     op = st.session_state.dados_operacionais
 
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📊", "Configuração Fiscal")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        regime = st.selectbox("Regime Tributário *", ["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"],
-            index=["Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI"].index(op.get('regime', 'Simples Nacional')) if op.get('regime') else 0)
-        faturamento = st.number_input("Faturamento médio mensal (R$) *", min_value=0.0, step=1000.0, format="%.2f", value=float(op.get('faturamento_mensal', 0)))
-        num_notas = st.number_input("Notas fiscais emitidas/mês *", min_value=0, step=1, value=int(op.get('num_notas', 0)))
-        num_filiais = st.number_input("Número de filiais", min_value=0, step=1, value=int(op.get('num_filiais', 0)), help="0 = apenas matriz")
-    with col2:
-        num_funcionarios = st.number_input("Número de funcionários", min_value=0, step=1, value=int(op.get('num_funcionarios', 0)))
-        tem_estoque = st.checkbox("Possui controle de estoque?", value=op.get('tem_estoque', False))
-        importa_exporta = st.checkbox("Realiza importação/exportação?", value=op.get('importa_exporta', False))
-        tem_simples_ativo = st.checkbox("Optante pelo Simples Nacional?", value=op.get('tem_simples_ativo', False))
+    ctitle("📊", "Configuração Fiscal")
+    c1, c2 = st.columns(2)
+    with c1:
+        regime  = st.selectbox("Regime Tributário *", ["Simples Nacional","Lucro Presumido","Lucro Real","MEI"],
+                    index=["Simples Nacional","Lucro Presumido","Lucro Real","MEI"].index(op.get('regime','Simples Nacional')) if op.get('regime') else 0)
+        faturam = st.number_input("Faturamento médio mensal (R$) *", min_value=0.0, step=1000.0, format="%.2f", value=float(op.get('faturamento_mensal',0)))
+        n_notas = st.number_input("Notas fiscais / mês *", min_value=0, step=1, value=int(op.get('num_notas',0)))
+        n_filiais=st.number_input("Número de filiais", min_value=0, step=1, value=int(op.get('num_filiais',0)), help="0 = apenas matriz")
+    with c2:
+        n_func  = st.number_input("Número de funcionários", min_value=0, step=1, value=int(op.get('num_funcionarios',0)))
+        estoque = st.checkbox("Possui controle de estoque?", value=op.get('tem_estoque',False))
+        imp_exp = st.checkbox("Realiza importação/exportação?", value=op.get('importa_exporta',False))
+        simples = st.checkbox("Optante pelo Simples Nacional?", value=op.get('tem_simples_ativo',False))
 
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        situacao_fiscal = st.radio("Situação fiscal *", ["Em dia", "Com pendências / irregularidades"],
-            index=1 if op.get('situacao_fiscal') == 'irregular' else 0)
-        contabilidade_atual = st.radio("Possui contador atualmente?", ["Não", "Sim, quero trocar", "Sim, consultoria adicional"],
-            index=["Não", "Sim, quero trocar", "Sim, consultoria adicional"].index(op.get('contabilidade_atual', 'Não')) if op.get('contabilidade_atual') in ["Não", "Sim, quero trocar", "Sim, consultoria adicional"] else 0)
-    with col2:
-        tipo_servico = st.multiselect("Serviços de interesse",
-            ["Contabilidade Geral", "Abertura de Empresa", "Encerramento de Empresa",
-             "BPO Financeiro", "Folha de Pagamento", "Planejamento Tributário",
-             "Consultoria Fiscal", "Regularização Fiscal", "Certidões e Declarações"],
-            default=op.get('tipo_servico', []))
+    c1, c2 = st.columns(2)
+    with c1:
+        sit_fisc = st.radio("Situação fiscal *", ["Em dia","Com pendências / irregularidades"],
+                    index=1 if op.get('situacao_fiscal')=='irregular' else 0)
+        cont_atual=st.radio("Possui contador atualmente?",["Não","Sim, quero trocar","Sim, consultoria adicional"],
+                    index=["Não","Sim, quero trocar","Sim, consultoria adicional"].index(op.get('contabilidade_atual','Não')) if op.get('contabilidade_atual') in ["Não","Sim, quero trocar","Sim, consultoria adicional"] else 0)
+    with c2:
+        servicos = st.multiselect("Serviços de interesse",
+            ["Contabilidade Geral","Abertura de Empresa","Encerramento de Empresa",
+             "BPO Financeiro","Folha de Pagamento","Planejamento Tributário",
+             "Consultoria Fiscal","Regularização Fiscal","Certidões e Declarações"],
+            default=op.get('tipo_servico',[]))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📞", "Dados de Contato")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        contato_nome = st.text_input("Nome do responsável *", value=op.get('contato_nome', ''))
-        contato_email = st.text_input("E-mail *", value=op.get('contato_email', ''))
-    with col2:
-        contato_telefone = st.text_input("Telefone / WhatsApp *", value=op.get('contato_telefone', ''), placeholder="(00) 00000-0000")
-        expectativa = st.selectbox("Início desejado dos serviços",
-            ["Imediato (o mais rápido possível)", "Próximo mês", "Em até 3 meses", "Apenas cotação por enquanto"],
-            index=["Imediato (o mais rápido possível)", "Próximo mês", "Em até 3 meses", "Apenas cotação por enquanto"].index(op.get('expectativa', 'Imediato (o mais rápido possível)')) if op.get('expectativa') in ["Imediato (o mais rápido possível)", "Próximo mês", "Em até 3 meses", "Apenas cotação por enquanto"] else 0)
-
-    observacoes = st.text_area("Observações ou necessidades específicas", value=op.get('observacoes', ''), placeholder="Descreva qualquer informação adicional relevante...", height=80)
+    ctitle("📞", "Dados de Contato")
+    c1, c2 = st.columns(2)
+    with c1:
+        c_nome = st.text_input("Nome do responsável *", value=op.get('contato_nome',''))
+        c_email= st.text_input("E-mail *",               value=op.get('contato_email',''))
+    with c2:
+        c_tel  = st.text_input("Telefone / WhatsApp *",  value=op.get('contato_telefone',''), placeholder="(00) 00000-0000")
+        expect = st.selectbox("Início desejado",
+            ["Imediato (o mais rápido possível)","Próximo mês","Em até 3 meses","Apenas cotação por enquanto"],
+            index=["Imediato (o mais rápido possível)","Próximo mês","Em até 3 meses","Apenas cotação por enquanto"].index(op.get('expectativa','Imediato (o mais rápido possível)')) if op.get('expectativa') in ["Imediato (o mais rápido possível)","Próximo mês","Em até 3 meses","Apenas cotação por enquanto"] else 0)
+    obs = st.text_area("Observações", value=op.get('observacoes',''), placeholder="Informações adicionais...", height=75)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬅  Voltar", use_container_width=True, type="secondary"):
-            st.session_state.step = 1
-            st.rerun()
-    with col2:
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("⬅  Voltar", use_container_width=True, type="secondary"): st.session_state.step=1; st.rerun()
+    with c2:
         if st.button("Próximo  ➡", use_container_width=True, type="primary"):
-            erros = []
-            if not contato_nome.strip(): erros.append("Nome do responsável é obrigatório.")
-            if not validar_email(contato_email): erros.append("E-mail inválido.")
-            if not validar_telefone(contato_telefone): erros.append("Telefone inválido (10 ou 11 dígitos).")
-            if faturamento <= 0: erros.append("Informe o faturamento médio mensal.")
-            if erros:
-                for e in erros: st.error(f"❌ {e}")
-            else:
+            erros=[]
+            if not c_nome.strip(): erros.append("Nome do responsável obrigatório.")
+            if not validar_email(c_email): erros.append("E-mail inválido.")
+            if not validar_telefone(c_tel): erros.append("Telefone inválido.")
+            if faturam <= 0: erros.append("Informe o faturamento médio mensal.")
+            for e in erros: st.error(f"❌ {e}")
+            if not erros:
                 st.session_state.dados_operacionais = {
-                    'regime': regime, 'faturamento_mensal': faturamento,
-                    'num_notas': num_notas, 'num_filiais': num_filiais,
-                    'num_funcionarios': num_funcionarios,
-                    'tem_estoque': tem_estoque, 'importa_exporta': importa_exporta,
-                    'tem_simples_ativo': tem_simples_ativo,
-                    'situacao_fiscal': 'irregular' if 'pendências' in situacao_fiscal else 'regular',
-                    'contabilidade_atual': contabilidade_atual,
-                    'tipo_servico': tipo_servico,
-                    'contato_nome': contato_nome, 'contato_email': contato_email,
-                    'contato_telefone': formatar_telefone(contato_telefone),
-                    'expectativa': expectativa, 'observacoes': observacoes,
+                    'regime':regime,'faturamento_mensal':faturam,'num_notas':n_notas,
+                    'num_filiais':n_filiais,'num_funcionarios':n_func,
+                    'tem_estoque':estoque,'importa_exporta':imp_exp,'tem_simples_ativo':simples,
+                    'situacao_fiscal':'irregular' if 'pendências' in sit_fisc else 'regular',
+                    'contabilidade_atual':cont_atual,'tipo_servico':servicos,
+                    'contato_nome':c_nome,'contato_email':c_email,
+                    'contato_telefone':fmt_tel(c_tel),'expectativa':expect,'observacoes':obs,
                 }
-                st.session_state.step = 3
-                st.rerun()
+                st.session_state.step=3; st.rerun()
 
 
-def _etapa_fiscal_pf():
+def _fiscal_pf():
     op = st.session_state.dados_operacionais
 
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📊", "Perfil Financeiro")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        renda_mensal = st.number_input("Renda mensal aproximada (R$) *", min_value=0.0, step=500.0, format="%.2f", value=float(op.get('renda_mensal', 0)))
-        possui_bens = st.checkbox("Possui bens imóveis?", value=op.get('possui_bens', False))
-        possui_investimentos = st.checkbox("Possui investimentos / aplicações?", value=op.get('possui_investimentos', False))
-        renda_exterior = st.checkbox("Possui renda no exterior?", value=op.get('renda_exterior', False))
-    with col2:
-        autonomo = st.checkbox("É autônomo / prestador de serviços?", value=op.get('autonomo', False))
-        pensao = st.checkbox("Recebe pensão alimentícia?", value=op.get('pensao', False))
-        socio_empresa = st.checkbox("É sócio de alguma empresa?", value=op.get('socio_empresa', False))
-        heranca = st.checkbox("Recebeu herança ou doação no ano?", value=op.get('heranca', False))
+    ctitle("📊", "Perfil Financeiro")
+    c1, c2 = st.columns(2)
+    with c1:
+        renda  = st.number_input("Renda mensal aproximada (R$) *", min_value=0.0, step=500.0, format="%.2f", value=float(op.get('renda_mensal',0)))
+        bens   = st.checkbox("Possui bens imóveis?",        value=op.get('possui_bens',False))
+        invest = st.checkbox("Possui investimentos?",        value=op.get('possui_investimentos',False))
+        exterior=st.checkbox("Possui renda no exterior?",   value=op.get('renda_exterior',False))
+    with c2:
+        autono = st.checkbox("É autônomo / prestador?",     value=op.get('autonomo',False))
+        pensao = st.checkbox("Recebe pensão alimentícia?",  value=op.get('pensao',False))
+        socio  = st.checkbox("É sócio de alguma empresa?",  value=op.get('socio_empresa',False))
+        heranca= st.checkbox("Recebeu herança/doação?",     value=op.get('heranca',False))
 
     st.markdown('<hr class="divider">', unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        tipo_declaracao = st.radio("Tipo preferido de declaração",
-            ["Simplificada", "Completa (deduções)", "Não sei — quero orientação"],
-            index=["Simplificada", "Completa (deduções)", "Não sei — quero orientação"].index(op.get('tipo_declaracao', 'Simplificada')) if op.get('tipo_declaracao') in ["Simplificada", "Completa (deduções)", "Não sei — quero orientação"] else 0)
-    with col2:
-        tipo_servico_pf = st.multiselect("Serviços de interesse",
-            ["Imposto de Renda (IRPF)", "Planejamento Patrimonial",
-             "Consultoria Tributária", "Regularização junto à Receita",
-             "Declaração em Atraso", "Herança / Doação / Inventário"],
-            default=op.get('tipo_servico', []))
+    c1, c2 = st.columns(2)
+    with c1:
+        tipo_dec = st.radio("Tipo de declaração",
+            ["Simplificada","Completa (deduções)","Não sei — quero orientação"],
+            index=["Simplificada","Completa (deduções)","Não sei — quero orientação"].index(op.get('tipo_declaracao','Simplificada')) if op.get('tipo_declaracao') in ["Simplificada","Completa (deduções)","Não sei — quero orientação"] else 0)
+    with c2:
+        servicos_pf = st.multiselect("Serviços de interesse",
+            ["Imposto de Renda (IRPF)","Planejamento Patrimonial","Consultoria Tributária",
+             "Regularização junto à Receita","Declaração em Atraso","Herança / Doação / Inventário"],
+            default=op.get('tipo_servico',[]))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📞", "Dados de Contato")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        contato_email = st.text_input("E-mail *", value=op.get('contato_email', ''), key='email_pf')
-    with col2:
-        contato_telefone = st.text_input("Telefone / WhatsApp *", value=op.get('contato_telefone', ''), placeholder="(00) 00000-0000", key='tel_pf')
-
-    expectativa_pf = st.selectbox("Início desejado",
-        ["Imediato", "Próximo mês", "Apenas cotação"],
-        index=["Imediato", "Próximo mês", "Apenas cotação"].index(op.get('expectativa', 'Imediato')) if op.get('expectativa') in ["Imediato", "Próximo mês", "Apenas cotação"] else 0)
-    observacoes_pf = st.text_area("Observações", value=op.get('observacoes', ''), placeholder="Informações adicionais...", height=75)
+    ctitle("📞", "Dados de Contato")
+    c1, c2 = st.columns(2)
+    with c1: c_email= st.text_input("E-mail *",              value=op.get('contato_email',''), key='em_pf')
+    with c2: c_tel  = st.text_input("Telefone / WhatsApp *", value=op.get('contato_telefone',''), placeholder="(00) 00000-0000", key='tel_pf')
+    expect = st.selectbox("Início desejado", ["Imediato","Próximo mês","Apenas cotação"],
+        index=["Imediato","Próximo mês","Apenas cotação"].index(op.get('expectativa','Imediato')) if op.get('expectativa') in ["Imediato","Próximo mês","Apenas cotação"] else 0)
+    obs = st.text_area("Observações", value=op.get('observacoes',''), placeholder="Informações adicionais...", height=70)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬅  Voltar", use_container_width=True, type="secondary"):
-            st.session_state.step = 1
-            st.rerun()
-    with col2:
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("⬅  Voltar", use_container_width=True, type="secondary"): st.session_state.step=1; st.rerun()
+    with c2:
         if st.button("Próximo  ➡", use_container_width=True, type="primary"):
-            erros = []
-            if not validar_email(contato_email): erros.append("E-mail inválido.")
-            if not validar_telefone(contato_telefone): erros.append("Telefone inválido.")
-            if renda_mensal <= 0: erros.append("Informe a renda mensal aproximada.")
-            if erros:
-                for e in erros: st.error(f"❌ {e}")
-            else:
+            erros=[]
+            if not validar_email(c_email): erros.append("E-mail inválido.")
+            if not validar_telefone(c_tel): erros.append("Telefone inválido.")
+            if renda <= 0: erros.append("Informe a renda mensal aproximada.")
+            for e in erros: st.error(f"❌ {e}")
+            if not erros:
                 st.session_state.dados_operacionais = {
-                    'renda_mensal': renda_mensal, 'possui_bens': possui_bens,
-                    'possui_investimentos': possui_investimentos, 'renda_exterior': renda_exterior,
-                    'autonomo': autonomo, 'pensao': pensao,
-                    'socio_empresa': socio_empresa, 'heranca': heranca,
-                    'tipo_declaracao': tipo_declaracao, 'tipo_servico': tipo_servico_pf,
-                    'contato_email': contato_email,
-                    'contato_telefone': formatar_telefone(contato_telefone),
-                    'expectativa': expectativa_pf, 'observacoes': observacoes_pf,
+                    'renda_mensal':renda,'possui_bens':bens,'possui_investimentos':invest,
+                    'renda_exterior':exterior,'autonomo':autono,'pensao':pensao,
+                    'socio_empresa':socio,'heranca':heranca,'tipo_declaracao':tipo_dec,
+                    'tipo_servico':servicos_pf,'contato_email':c_email,
+                    'contato_telefone':fmt_tel(c_tel),'expectativa':expect,'observacoes':obs,
                 }
-                st.session_state.step = 3
-                st.rerun()
+                st.session_state.step=3; st.rerun()
 
 
 # =============================================================================
-# ETAPA 3 — DOCUMENTOS + CÂMERA
+# ETAPA 3 — DOCUMENTOS
 # =============================================================================
-def etapa_upload():
-    perfil = st.session_state.perfil
+def etapa_docs():
+    perf = st.session_state.perfil
 
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📎", "Documentação para Análise")
-
+    ctitle("📎", "Documentação para Análise")
     st.markdown("""
-    <p style="font-size:0.78rem;color:#334155;margin-bottom:1rem;line-height:1.5;">
-        O envio é <strong style="color:#64748b">opcional</strong> neste momento — nossa equipe poderá solicitar
-        posteriormente. Mas enviar agora <strong style="color:#64748b">agiliza sua proposta</strong>.
-        Você pode <strong style="color:#64748b">enviar arquivo</strong> ou <strong style="color:#64748b">fotografar com a câmera</strong> do celular.
+    <p style="font-size:0.76rem;color:#2d3f58;margin-bottom:1rem;line-height:1.5;">
+        Envio <strong style="color:#536882">opcional</strong> — nossa equipe pode solicitar depois.
+        Enviar agora <strong style="color:#536882">acelera sua proposta</strong>.
+        Use <strong style="color:#536882">arquivo</strong> ou <strong style="color:#536882">câmera do celular</strong>.
     </p>
     """, unsafe_allow_html=True)
 
-    docs_salvos = []
-
-    if perfil == 'PJ':
-        _doc_upload_com_camera("📄 Cartão CNPJ", "cartao_cnpj", "Frente do cartão CNPJ emitido pela Receita Federal")
-        _doc_upload_com_camera("📝 Contrato / Estatuto Social", "contrato_social", "Última versão consolidada")
-        _doc_upload_com_camera("📋 Últimas guias pagas (DAS, GPS)", "ultimas_guias", "DAS, GPS, DARF, etc.")
-        _doc_upload_com_camera("📊 Balanço / DRE (se disponível)", "balanco_dre", "Último exercício disponível")
-        docs_salvos = [st.session_state.get(f'doc_{k}') for k in ['cartao_cnpj', 'contrato_social', 'ultimas_guias', 'balanco_dre'] if st.session_state.get(f'doc_{k}')]
+    if perf == 'PJ':
+        _doc_item("📄 Cartão CNPJ",             "d_cnpj",     "Emitido pela Receita Federal")
+        _doc_item("📝 Contrato / Estatuto Social","d_contrato", "Última versão consolidada")
+        _doc_item("📋 Últimas guias pagas",       "d_guias",    "DAS, GPS, DARF, etc.")
+        _doc_item("📊 Balanço / DRE",             "d_balanco",  "Último exercício disponível")
+        chaves = ['d_cnpj','d_contrato','d_guias','d_balanco']
     else:
-        _doc_upload_com_camera("🪪 RG, CNH ou Passaporte", "doc_id", "Frente e verso — legível")
-        _doc_upload_com_camera("🏠 Comprovante de Residência", "comp_res", "Últimos 90 dias")
-        _doc_upload_com_camera("📋 Última declaração de IR", "declaracao_ir", "Recibo de entrega da última declaração")
-        _doc_upload_com_camera("💼 Informe de Rendimentos", "informe_rend", "Todos os informes do ano")
-        docs_salvos = [st.session_state.get(f'doc_{k}') for k in ['doc_id', 'comp_res', 'declaracao_ir', 'informe_rend'] if st.session_state.get(f'doc_{k}')]
+        _doc_item("🪪 RG, CNH ou Passaporte",    "d_id",       "Frente e verso — legível")
+        _doc_item("🏠 Comprovante de Residência", "d_res",      "Últimos 90 dias")
+        _doc_item("📋 Última declaração de IR",   "d_ir",       "Recibo de entrega")
+        _doc_item("💼 Informe de Rendimentos",    "d_informe",  "Todos os informes do ano")
+        chaves = ['d_id','d_res','d_ir','d_informe']
 
-    if docs_salvos:
-        st.markdown(f'<div class="auto-badge">📎 {len(docs_salvos)} arquivo(s) anexado(s)</div>', unsafe_allow_html=True)
-
-    st.session_state.documentos = docs_salvos
+    salvos = [st.session_state.get(k) for k in chaves if st.session_state.get(k)]
+    if salvos: badge(f"📎 {len(salvos)} arquivo(s) anexado(s)")
+    st.session_state.documentos = salvos
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("⬅  Voltar", use_container_width=True, type="secondary"):
-            st.session_state.step = 2
-            st.rerun()
-    with col2:
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("⬅  Voltar", use_container_width=True, type="secondary"): st.session_state.step=2; st.rerun()
+    with c2:
         if st.button("✅  Finalizar Cadastro", use_container_width=True, type="primary"):
-            if st.session_state.perfil == 'PJ':
-                st.session_state.honorario_interno = calcular_honorario_pj(st.session_state.dados_operacionais)
-            else:
-                st.session_state.honorario_interno = calcular_honorario_pf(st.session_state.dados_operacionais)
-            st.session_state.step = 4
-            st.rerun()
+            if perf == 'PJ': st.session_state.honorario_interno = calcular_honorario_pj(st.session_state.dados_operacionais)
+            else:            st.session_state.honorario_interno = calcular_honorario_pf(st.session_state.dados_operacionais)
+            st.session_state.step=4; st.rerun()
 
 
-def _doc_upload_com_camera(label: str, chave: str, descricao: str):
-    """Componente de upload com alternativa de câmera (foto direta no celular)."""
-    key_arquivo = f'doc_{chave}'
-    key_camera = f'cam_{chave}'
-    key_modo = f'modo_{chave}'
-
-    if key_modo not in st.session_state:
-        st.session_state[key_modo] = 'arquivo'
-
+def _doc_item(label: str, chave: str, descricao: str):
     st.markdown(f"""
-    <div style="margin-bottom:0.3rem;">
-        <div style="font-size:0.73rem;font-weight:700;color:#64748b;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:3px;">{label}</div>
-        <div style="font-size:0.68rem;color:#334155;margin-bottom:6px;">{descricao}</div>
+    <div style="margin-bottom:3px;">
+        <div style="font-size:0.7rem;font-weight:700;color:#536882;letter-spacing:0.05em;text-transform:uppercase;">{label}</div>
+        <div style="font-size:0.65rem;color:#2d3f58;margin-bottom:5px;">{descricao}</div>
     </div>
     """, unsafe_allow_html=True)
-
-    col_a, col_b = st.columns(2)
-    with col_a:
-        arquivo = st.file_uploader(
-            f"Enviar arquivo — {label}",
-            type=['pdf', 'png', 'jpg', 'jpeg'],
-            key=f'up_{chave}',
-            label_visibility='collapsed'
-        )
-        if arquivo:
-            st.session_state[key_arquivo] = arquivo
-    with col_b:
-        foto = st.camera_input(
-            f"Tirar foto — {label}",
-            key=f'cam_{chave}',
-            label_visibility='collapsed',
-            help="Abra a câmera do dispositivo para fotografar o documento"
-        )
-        if foto:
-            st.session_state[key_arquivo] = foto
-
-    if st.session_state.get(key_arquivo):
-        st.markdown(f'<div class="auto-badge" style="margin-bottom:10px;">✓ Documento recebido</div>', unsafe_allow_html=True)
-
-    st.markdown('<hr class="divider" style="margin:0.6rem 0;">', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        arq = st.file_uploader(label, type=['pdf','png','jpg','jpeg'],
+                               key=f'up_{chave}', label_visibility='collapsed')
+        if arq: st.session_state[chave] = arq
+    with c2:
+        foto = st.camera_input(label, key=f'cam_{chave}', label_visibility='collapsed')
+        if foto: st.session_state[chave] = foto
+    if st.session_state.get(chave):
+        st.markdown('<div class="auto-badge" style="margin:2px 0 6px;">✓ Recebido</div>', unsafe_allow_html=True)
+    st.markdown('<hr class="divider" style="margin:0.55rem 0;">', unsafe_allow_html=True)
 
 
 # =============================================================================
-# ETAPA 4 — SUCESSO
+# ETAPA 4 — SUCESSO + FICHA PARA DOWNLOAD
 # =============================================================================
 def etapa_sucesso():
     st.balloons()
+    dc  = st.session_state.dados_cadastrais
+    op  = st.session_state.dados_operacionais
+    perf= st.session_state.perfil
 
-    dados_cad = st.session_state.dados_cadastrais
-    dados_op = st.session_state.dados_operacionais
-    perfil = st.session_state.perfil
-
+    # Cabeçalho de sucesso
     st.markdown("""
-    <div style="text-align:center;padding:2rem 0 1.4rem 0;animation:fadeSlideDown 0.7s ease both;">
-        <div style="font-size:3rem;margin-bottom:0.8rem;">✅</div>
-        <div style="font-family:'Instrument Serif',Georgia,serif !important;font-style:italic;font-size:1.9rem;color:#e2e8f0;line-height:1.1;margin-bottom:0.5rem;">
-            Cadastro Recebido
+    <div style="text-align:center;padding:1.8rem 0 1.2rem;animation:fadeDown 0.7s ease both;">
+        <div style="font-size:2.8rem;margin-bottom:0.7rem;">✅</div>
+        <div style="font-size:1.65rem;font-weight:800;color:#dde6f0;letter-spacing:-0.02em;line-height:1.1;margin-bottom:0.4rem;">
+            Cadastro Recebido!
         </div>
-        <p style="font-size:0.82rem;color:#334155;max-width:360px;margin:0 auto;line-height:1.6;">
-            Obrigado pela confiança na <strong style="color:#4f8ef7">BSB Contabilidade</strong>.<br>
-            Nossa equipe enviará uma proposta personalizada em até
-            <strong style="color:#4f8ef7">24 horas úteis</strong>.
+        <p style="font-size:0.8rem;color:#2d3f58;max-width:340px;margin:0 auto;line-height:1.6;">
+            Obrigado pela confiança na <strong style="color:#5ba3f5">BSB Contabilidade</strong>.<br>
+            Proposta personalizada em até <strong style="color:#5ba3f5">24 horas úteis</strong>.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
+    # Resumo
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    card_title("📋", "Resumo do Cadastro")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if perfil == 'PJ':
-            st.markdown(f"<div style='font-size:0.8rem;color:#64748b;'>Empresa</div><div style='color:#e2e8f0;font-weight:600;font-size:0.9rem;'>{dados_cad.get('razao_social','—')}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='font-size:0.8rem;color:#64748b;margin-top:8px;'>CNPJ</div><div style='color:#e2e8f0;font-size:0.85rem;'>{dados_cad.get('cnpj','—')}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='font-size:0.8rem;color:#64748b;margin-top:8px;'>Regime</div><div style='color:#e2e8f0;font-size:0.85rem;'>{dados_op.get('regime','—')}</div>", unsafe_allow_html=True)
+    ctitle("📋", "Resumo do Cadastro")
+    c1, c2 = st.columns(2)
+    with c1:
+        if perf == 'PJ':
+            _info_row("Empresa",  dc.get('razao_social','—'), bold=True)
+            _info_row("CNPJ",     dc.get('cnpj','—'))
+            _info_row("Regime",   op.get('regime','—'))
         else:
-            st.markdown(f"<div style='font-size:0.8rem;color:#64748b;'>Nome</div><div style='color:#e2e8f0;font-weight:600;font-size:0.9rem;'>{dados_cad.get('nome','—')}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div style='font-size:0.8rem;color:#64748b;margin-top:8px;'>CPF</div><div style='color:#e2e8f0;font-size:0.85rem;'>{dados_cad.get('cpf','—')}</div>", unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"<div style='font-size:0.8rem;color:#64748b;'>E-mail</div><div style='color:#e2e8f0;font-size:0.85rem;'>{dados_op.get('contato_email','—')}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div style='font-size:0.8rem;color:#64748b;margin-top:8px;'>Telefone</div><div style='color:#e2e8f0;font-size:0.85rem;'>{dados_op.get('contato_telefone','—')}</div>", unsafe_allow_html=True)
-        if dados_op.get('expectativa'):
-            st.markdown(f"<div style='font-size:0.8rem;color:#64748b;margin-top:8px;'>Início desejado</div><div style='color:#e2e8f0;font-size:0.85rem;'>{dados_op.get('expectativa')}</div>", unsafe_allow_html=True)
+            _info_row("Nome",     dc.get('nome','—'), bold=True)
+            _info_row("CPF",      dc.get('cpf','—'))
+    with c2:
+        _info_row("E-mail",   op.get('contato_email','—'))
+        _info_row("Telefone", op.get('contato_telefone','—'))
+        if op.get('expectativa'): _info_row("Início", op.get('expectativa'))
 
-    if dados_op.get('tipo_servico'):
+    if op.get('tipo_servico'):
         st.markdown('<hr class="divider">', unsafe_allow_html=True)
-        st.markdown('<div style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#475569;margin-bottom:6px;">Serviços solicitados</div>', unsafe_allow_html=True)
-        for s in dados_op['tipo_servico']:
-            st.markdown(f"<div style='font-size:0.8rem;color:#93b4fb;padding:2px 0;'>✓ {s}</div>", unsafe_allow_html=True)
+        st.markdown('<div style="font-size:0.68rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#3d5069;margin-bottom:5px;">Serviços solicitados</div>', unsafe_allow_html=True)
+        for s in op['tipo_servico']:
+            st.markdown(f"<div style='font-size:0.78rem;color:#7aaaf5;padding:1px 0;'>✓ {s}</div>", unsafe_allow_html=True)
 
-    n_docs = len(st.session_state.documentos)
-    if n_docs > 0:
-        st.markdown(f"<div style='margin-top:10px;font-size:0.78rem;color:#34d399;'>📎 {n_docs} documento(s) anexado(s)</div>", unsafe_allow_html=True)
+    n = len(st.session_state.documentos)
+    if n: st.markdown(f"<div style='margin-top:8px;font-size:0.75rem;color:#2dd4a0;'>📎 {n} documento(s) anexado(s)</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    # ── FICHA ESTRUTURADA PARA DOWNLOAD ────────────────────────────────
+    st.markdown('<div class="section-card">', unsafe_allow_html=True)
+    ctitle("📄", "Ficha de Cadastro — para o Contador")
+    st.markdown("""
+    <p style="font-size:0.76rem;color:#2d3f58;margin-bottom:0.9rem;line-height:1.5;">
+        Faça o download da ficha estruturada com todas as informações cadastradas.
+        Pronta para uso interno do escritório.
+    </p>
+    """, unsafe_allow_html=True)
+
+    ficha_txt = gerar_ficha_texto()
+
+    # Exibir prévia
+    with st.expander("👁️  Visualizar ficha"):
+        st.code(ficha_txt, language=None)
+
+    # Download como .txt
+    nome_arquivo = (
+        f"BSB_Ficha_{re.sub(r'[^a-zA-Z0-9]','_', dc.get('razao_social', dc.get('nome','Cliente')))[:30]}_{datetime.now().strftime('%Y%m%d_%H%M')}.txt"
+    )
+    st.download_button(
+        label="⬇️  Baixar Ficha de Cadastro (.txt)",
+        data=ficha_txt.encode('utf-8'),
+        file_name=nome_arquivo,
+        mime="text/plain",
+        use_container_width=True,
+    )
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
     if st.button("🔄  Novo Cadastro", use_container_width=True, type="secondary"):
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
+        for k in list(st.session_state.keys()): del st.session_state[k]
         st.rerun()
+
+
+def _info_row(label: str, value: str, bold: bool = False):
+    w = "font-weight:700;" if bold else ""
+    st.markdown(
+        f"<div style='margin-bottom:7px;'>"
+        f"<div style='font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#3d5069;'>{label}</div>"
+        f"<div style='font-size:0.84rem;color:#c5d4e5;{w}'>{value}</div>"
+        f"</div>", unsafe_allow_html=True)
 
 
 # =============================================================================
