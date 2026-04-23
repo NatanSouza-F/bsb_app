@@ -909,8 +909,8 @@ def _cadastral_pj():
     c1, c2 = st.columns([3,1])
     with c1: cnpj_v = st.text_input("CNPJ *", value=dc.get('cnpj',''), placeholder="00.000.000/0000-00", key='k_cnpj')
     with c2:
-        st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        if st.button("🔍 Buscar", use_container_width=True, type="secondary", key='btn_cnpj'):
+        st.text_input("​", value="", key="_sp_cnpj", label_visibility="visible", disabled=True)
+        if st.button("🔍 Buscar", use_container_width=True, type="primary", key='btn_cnpj'):
             limpo = re.sub(r'\D','',cnpj_v)
             if not validar_cnpj(limpo):
                 st.error("❌ CNPJ inválido.")
@@ -1047,8 +1047,8 @@ def _bloco_cep(sufixo: str):
     c1, c2 = st.columns([3,1])
     with c1: cep_v = st.text_input("CEP *", value=dc.get('cep',''), placeholder="00000-000", key=f'cep_{sufixo}')
     with c2:
-        st.markdown("<div style='height:27px'></div>", unsafe_allow_html=True)
-        if st.button("📍 Buscar", use_container_width=True, type="secondary", key=f'btn_cep_{sufixo}'):
+        st.text_input("​", value="", key=f"_sp_cep_{sufixo}", label_visibility="visible", disabled=True)
+        if st.button("📍 Buscar", use_container_width=True, type="primary", key=f'btn_cep_{sufixo}'):
             c = re.sub(r'\D','',cep_v)
             if len(c) != 8:
                 st.error("CEP deve ter 8 dígitos.")
