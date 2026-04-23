@@ -852,19 +852,37 @@ def main():
 def etapa_perfil():
     st.markdown('<div class="section-card">', unsafe_allow_html=True)
     ctitle("🚀", "Como deseja ser atendido?")
-    st.markdown('<p style="font-size:0.78rem;color:#2d3f58;margin-bottom:1rem;line-height:1.5;">Selecione o perfil para personalizarmos sua proposta.</p>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:0.78rem;color:#2d3f58;margin-bottom:1.2rem;line-height:1.5;">Selecione o perfil para personalizarmos sua proposta.</p>', unsafe_allow_html=True)
 
+    # Cards visuais — puramente decorativos, os botões ficam abaixo
+    st.markdown("""
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div style="background:rgba(5,11,22,0.85);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:18px 14px 14px;text-align:center;">
+            <div style="font-size:1.8rem;margin-bottom:6px;">🏢</div>
+            <div style="font-size:0.82rem;font-weight:700;color:#c5d4e5;letter-spacing:-0.01em;margin-bottom:3px;">Pessoa Jurídica</div>
+            <div style="font-size:0.68rem;color:#3d5069;line-height:1.4;">Empresas · MEI · Startups</div>
+        </div>
+        <div style="background:rgba(5,11,22,0.85);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:18px 14px 14px;text-align:center;">
+            <div style="font-size:1.8rem;margin-bottom:6px;">👤</div>
+            <div style="font-size:0.82rem;font-weight:700;color:#c5d4e5;letter-spacing:-0.01em;margin-bottom:3px;">Pessoa Física</div>
+            <div style="font-size:0.68rem;color:#3d5069;line-height:1.4;">Autônomos · Profissionais · IR</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Botões funcionais — limpos, sem \n, tamanho uniforme
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("🏢  Pessoa Jurídica\nEmpresas · MEI · Startups", use_container_width=True):
+        if st.button("Selecionar  →", use_container_width=True, key="btn_pj"):
             st.session_state.perfil = 'PJ'; st.session_state.step = 1; st.rerun()
     with c2:
-        if st.button("👤  Pessoa Física\nAutônomos · Profissionais · IR", use_container_width=True):
+        if st.button("Selecionar  →", use_container_width=True, key="btn_pf"):
             st.session_state.perfil = 'PF'; st.session_state.step = 1; st.rerun()
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown("""
-    <div style="margin-top:0.9rem;padding:9px 12px;background:rgba(58,123,213,0.04);border-radius:8px;border:1px solid rgba(58,123,213,0.09);">
+    <div style="margin-top:0.8rem;padding:9px 12px;background:rgba(58,123,213,0.04);border-radius:8px;border:1px solid rgba(58,123,213,0.09);">
         <p style="font-size:0.74rem;color:#2d3f58;margin:0;text-align:center;line-height:1.55;">
             ⏱ Preenchimento em <strong style="color:#5ba3f5">3 a 5 minutos</strong> ·
             Proposta em até <strong style="color:#5ba3f5">24 horas úteis</strong>
